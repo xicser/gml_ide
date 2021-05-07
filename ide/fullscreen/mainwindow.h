@@ -36,32 +36,33 @@ private:
     /* 菜单栏相关 */
     QMenuBar       *menuBar;                              //菜单栏
 
-    //语言菜单
-    QMenu         *menuLanguage;
+    //文件菜单
+    QMenu         *menuFile;
+    QAction       *actionNew, *actionOpen, *actionSave, *actionSaveAs, *actionExit;
 
     //编辑菜单
-    QMenu          *menuEdit;
-    QAction        *actionChangeSize;
+    QMenu         *menuEdit;
+    QAction       *actionUndo, *actionRedo, *actionCut, *actionCopy, *actionPaste;
+    QMenu         *menuEncoding;
+    QAction       *actionUTF8, *actionGB2312;
 
-    //选项菜单
-    QMenu          *menuOpt;
-    QAction        *actionAutoMergeNearGraphic, *actionOpenNtp, *actionCloseGraphic;
+    //窗口菜单
+    QMenu          *menuWindow;
+    QAction        *actionClose, *actionCloseAll, *actionNext, *actionPrev;
 
-    //作图菜单
-    QAction        *actionPaint;
+    //帮助菜单
+    QMenu          *MenuHelp;
+    QAction        *actionAbout;
 
 
     /* 工具栏相关 */
     QToolBar       *toolBar;                              //工具栏
     QToolButton    *toolBtnOpenFile;                      //打开文件按钮
     QToolButton    *toolBtnSaveAs;                        //另存为按钮
-    QToolButton    *toolBtnUndo;                          //后退
-    QToolButton    *toolBtnRedo;                          //前进
-    QToolButton    *toolBtnZoomUp;                        //放大
-    QToolButton    *toolBtnZoomDown;                      //缩小
-    QToolButton    *toolBtnDispRestore;                   //显示恢复
-    QToolButton    *toolBtnPicDrag;                       //图形拖动
-    QToolButton    *toolBtnNormalOpt;                     //正常操作
+    QToolButton    *toolBtnUndo;                          //撤销
+    QToolButton    *toolBtnRedo;                          //重做
+    QToolButton    *toolBtnBuild;                         //构建
+    QToolButton    *toolBtnRun;                           //运行
     QToolButton    *toolBtnAbout;                         //关于
 
     /* 初始化相关 */

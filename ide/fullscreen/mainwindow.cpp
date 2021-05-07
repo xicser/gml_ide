@@ -78,31 +78,68 @@ void MainWindow::menuBarInit(void)
     menuBar = new QMenuBar(this);
     menuBar->setGeometry(0, 0, screenXSize, menuBarHeight);
 
-    menuLanguage = new QMenu(menuBar);                                      //语言菜单
+    menuFile = new QMenu(menuBar);                                          //文件菜单
+    menuFile->setTitle(tr("文件(&F)"));
+    menuBar->addMenu(menuFile);
+        actionNew = new QAction(tr("新建(&N)"), menuFile);
+        actionOpen = new QAction(tr("打开(&O)"), menuFile);
+        actionSave = new QAction(tr("保存(&S)"), menuFile);
+        actionSaveAs = new QAction(tr("另存为(&A)"), menuFile);
+        actionExit = new QAction(tr("退出(&N)"), menuFile);
+        menuFile->addAction(actionNew);
+        menuFile->addAction(actionOpen);
+        menuFile->addSeparator();
+        menuFile->addAction(actionSave);
+        menuFile->addAction(actionSaveAs);
+        menuFile->addSeparator();
+        menuFile->addAction(actionExit);
+
     menuEdit = new QMenu(menuBar);                                          //编辑菜单
-    menuOpt = new QMenu(menuBar);                                           //选项菜单
+    menuEdit->setTitle(tr("编辑(&E)"));
+    menuBar->addMenu(menuEdit);
+        actionUndo = new QAction(tr("撤销(&U)"), menuEdit);
+        actionRedo = new QAction(tr("重做(&R)"), menuEdit);
+        actionCut = new QAction(tr("剪切(&T)"), menuEdit);
+        actionCopy = new QAction(tr("复制(&C)"), menuEdit);
+        actionPaste = new QAction(tr("粘贴(&P)"), menuEdit);
+        menuEncoding = new QMenu(tr("编码格式(&S)"), menuEdit);
+        actionUTF8 = new QAction(tr("UTF-8"), menuEncoding);
+        actionGB2312 = new QAction(tr("GB2312"), menuEncoding);
+        menuEdit->addAction(actionUndo);
+        menuEdit->addAction(actionRedo);
+        menuEdit->addSeparator();
+        menuEdit->addAction(actionCut);
+        menuEdit->addAction(actionCopy);
+        menuEdit->addAction(actionPaste);
+        menuEdit->addSeparator();
+        menuEdit->addMenu(menuEncoding);
+        menuEncoding->addAction(actionUTF8);
+        menuEncoding->addAction(actionGB2312);
 
-    QString str = tr("语言");
-    menuLanguage->setTitle(str+"▼");
-    menuBar->addMenu(menuLanguage);
+    menuWindow = new QMenu(menuBar);                                          //窗口菜单
+    menuWindow->setTitle(tr("窗口(&W)"));
+    menuBar->addMenu(menuWindow);
+        actionClose = new QAction(tr("关闭(&C)"), menuWindow);
+        actionCloseAll = new QAction(tr("关闭所有(&U)"), menuWindow);
+        actionNext = new QAction(tr("下一个(&N)"), menuWindow);
+        actionPrev = new QAction(tr("上一个(&P)"), menuWindow);
+        menuWindow->addAction(actionClose);
+        menuWindow->addAction(actionCloseAll);
+        menuWindow->addSeparator();
+        menuWindow->addAction(actionNext);
+        menuWindow->addAction(actionPrev);
 
-    menuEdit = menuBar->addMenu(tr("编辑(&Y)"));
-    actionChangeSize = menuEdit->addAction(tr("改变大小(&Z)"));
+    MenuHelp = new QMenu(menuBar);    //帮助菜单
+    MenuHelp->setTitle(tr("帮助(&H)"));
+    menuBar->addMenu(MenuHelp);
+        actionAbout = new QAction(tr("关于(&A)"), MenuHelp);
+        MenuHelp->addAction(actionAbout);
 
-    menuOpt = menuBar->addMenu(tr("选项(&Z)"));
-    actionAutoMergeNearGraphic = menuOpt->addAction(tr("打开文件时, 自动合并临近图形(&Y)"));
-    actionAutoMergeNearGraphic->setCheckable(true);
-    actionAutoMergeNearGraphic->setChecked(true);
-    actionOpenNtp = menuOpt->addAction(tr("打开NTP文件时, 图形绝对坐标不变（用于免基准）(&N)"));
-    actionOpenNtp->setCheckable(true);
-    actionOpenNtp->setChecked(true);
-    actionCloseGraphic = menuOpt->addAction(tr("封闭图形首尾间距(&Z)"));
-
-    actionPaint = menuBar->addAction(tr("作图(&D)"));
-
-    menuLanguage->setStyleSheet(MENU_BAR_LANGUAGE);
+    //设置式样
+    menuFile->setStyleSheet(MENU_BAR_LANGUAGE);
     menuEdit->setStyleSheet(MENU_BAR_LANGUAGE);
-    menuOpt->setStyleSheet(MENU_BAR_LANGUAGE);
+    menuWindow->setStyleSheet(MENU_BAR_LANGUAGE);
+    MenuHelp->setStyleSheet(MENU_BAR_LANGUAGE);
 }
 
 /* 工具栏初始化 */
@@ -114,39 +151,31 @@ void MainWindow::toolBarInit(void)
     //按钮
     toolBtnOpenFile = new QToolButton(toolBar);                      //打开文件
     toolBtnSaveAs = new QToolButton(toolBar);                        //另存为按钮
-    toolBtnUndo = new QToolButton(toolBar);                          //后退
-    toolBtnRedo = new QToolButton(toolBar);                          //前进
-    toolBtnZoomUp = new QToolButton(toolBar);                        //放大
-    toolBtnZoomDown = new QToolButton(toolBar);                      //缩小
-    toolBtnDispRestore = new QToolButton(toolBar);                   //显示恢复
-    toolBtnPicDrag = new QToolButton(toolBar);                       //图片拖动
-    toolBtnNormalOpt = new QToolButton(toolBar);                     //正常操作
+    toolBtnUndo = new QToolButton(toolBar);                          //撤销
+    toolBtnRedo = new QToolButton(toolBar);                          //重做
+    toolBtnBuild = new QToolButton(toolBar);                         //构建
+    toolBtnRun = new QToolButton(toolBar);                           //运行
     toolBtnAbout = new QToolButton(toolBar);                         //关于
 
-    QToolButton *toolBtns[10] = {
+    QToolButton *toolBtns[7] = {
         toolBtnOpenFile,
         toolBtnSaveAs,
         toolBtnUndo,
         toolBtnRedo,
-        toolBtnZoomUp,
-        toolBtnZoomDown,
-        toolBtnDispRestore,
-        toolBtnPicDrag,
-        toolBtnNormalOpt,
+        toolBtnBuild,
+        toolBtnRun,
         toolBtnAbout
     };
-    QString strs[10] = {tr("打开(O)"), tr("另存为(S)"), tr("后退"), tr("前进"), tr("放大"), tr("缩小"), tr("显示恢复"), tr("图形拖动"), tr("正常操作"), tr("关于")};
-    QString pics[10] = {TOOL_BAR_OPEN_FILE_PIC, TOOL_BAR_SAVE_AS_PIC,
+    QString strs[7] = {tr("打开(O)"), tr("另存为(S)"), tr("撤销"), tr("重做"), tr("构建"), tr("运行"), tr("关于")};
+    QString pics[7] = {TOOL_BAR_OPEN_FILE_PIC, TOOL_BAR_SAVE_AS_PIC,
                             TOOL_BAR_UNDO_PIC, TOOL_BAR_REDO_PIC,
-                            TOOL_BAR_ZOOM_UP_PIC, TOOL_BAR_ZOOM_DOWN_PIC,
-                            TOOL_BAR_DISP_RESTORE_PIC, TOOL_BAR_PIC_DRAG_PIC,
-                            TOOL_BAR_NORMAL_OPT_PIC, TOOL_BAR_ABOUT_PIC};
+                            TOOL_BAR_PIC_DRAG_PIC, TOOL_BAR_NORMAL_OPT_PIC, TOOL_BAR_ABOUT_PIC};
     //最左边那个按钮的位置
     int x = 0;
     int picWidth = fontSize * TOOL_BAR_ICON_INIT_SIZE_DIV_DEF_FONT_SIZE;
     int width;
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 7; i++) {
 
         int len = strs[i].length();
 
@@ -172,15 +201,14 @@ void MainWindow::moveToolBarPosition(void)
 
     toolBar->setGeometry(0, menuBarHeight, screenXSize, toolBarHeight);
 
-    QToolButton *toolBtns0[10] = {toolBtnOpenFile, toolBtnSaveAs, toolBtnUndo,
-        toolBtnRedo, toolBtnZoomUp, toolBtnZoomDown, toolBtnDispRestore, toolBtnPicDrag,
-        toolBtnNormalOpt, toolBtnAbout};
-    QString strs[10] = {tr("打开(O)"), tr("另存为(S)"), tr("后退"), tr("前进"), tr("放大"), tr("缩小"), tr("显示恢复"), tr("图形拖动"), tr("正常操作"), tr("关于")};
+    QToolButton *toolBtns0[7] = {toolBtnOpenFile, toolBtnSaveAs, toolBtnUndo,
+        toolBtnRedo, toolBtnBuild, toolBtnRun, toolBtnAbout};
+    QString strs[7] = {tr("打开(O)"), tr("另存为(S)"), tr("撤销"), tr("重做"), tr("构建"), tr("运行"), tr("关于")};
 
     int x = 0, y = 0;
     int picWidth = fontSize * TOOL_BAR_ICON_INIT_SIZE_DIV_DEF_FONT_SIZE;
     int width, height = toolBarHeight;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 7; i++) {
         int len = strs[i].length();
         if (len == 5 || len == 6) {
             width = fontSize * len + picWidth;
