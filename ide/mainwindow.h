@@ -87,8 +87,9 @@ private:
     QActionGroup *openedFilesGrp; //文件窗口Action Group
 
     QMenuBar *menuBar;  //菜单栏
-    QToolBar *topToolBar;   //第一个工具栏
+    QToolBar *topToolBar;       //第一个工具栏
     QToolBar *bottomToolBar;    //第二个工具栏
+    QToolBar *buildToolBar;     //编译构建工具栏
 
     QComboBox *comboStyle;  //字体风格组合框
     QFontComboBox *comboFont;   //字体组合框
@@ -120,6 +121,11 @@ private:
     QAction *gotoLineAct;   //转到行
     QAction *preferenceAct; //首选项
 
+    QMenu *buildMenu;    //构建菜单
+    QAction *compileAct; //编译
+    QAction *deployAct;  //部署
+    QAction *runAct;     //运行
+
     QMenu *formatMenu;  //文本格式菜单
     QAction *colorAct;    //文本颜色
     QMenu *fontStyleMenu;   //字体风格
@@ -144,6 +150,8 @@ private:
     void setupFileActions();    //文件菜单Action设置
     void setupEditMenu();   //编辑菜单功能实现
     void setupEditActions();    //编辑菜单Action设置
+    void setupBuildMenu();   //构建菜单功能实现
+    void setupBuildActions(); //构建菜单Action设置
     void setupFormatMenu();    //格式菜单功能实现
     void setupFormatActions();  //格式菜单Action设置
     void setupWindowMenu(); //窗口菜单功能实现

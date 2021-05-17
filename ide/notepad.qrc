@@ -37,5 +37,8 @@
         <file>images/uppercase.png</file>
         <file>images/textfont.png</file>
         <file>images/notepad.png</file>
+        <file>images/compile.png</file>
+        <file>images/deploy.png</file>
+        <file>images/run.png</file>
     </qresource>
 </RCC>

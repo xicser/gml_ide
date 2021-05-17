@@ -28,6 +28,7 @@ MainWindow::MainWindow(Config *config, QWidget *parent) :
     init();
     setupFileMenu();
     setupEditMenu();
+    setupBuildMenu();
     setupFormatMenu();
     setupWindowMenu();
     setupHelpMenu();
@@ -47,10 +48,14 @@ void MainWindow::init()
     topToolBar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
     bottomToolBar = new QToolBar(this);
     bottomToolBar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
+    buildToolBar = new QToolBar(this);
+    buildToolBar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
     setMenuBar(menuBar);
     addToolBar(topToolBar);
     addToolBarBreak(Qt::TopToolBarArea);
     addToolBar(bottomToolBar);
+    addToolBarBreak(Qt::TopToolBarArea);
+    addToolBar(buildToolBar);
 
     comboFont = new QFontComboBox(bottomToolBar);
     comboFont->setCurrentFont(QFont(config->fontFamily));
@@ -708,6 +713,41 @@ void MainWindow::setupEditActions()
     connect(gotoLineAct,SIGNAL(triggered()),this,SLOT(gotoLine()));
     connect(findAct,SIGNAL(triggered()),this,SLOT(search()));
     connect(preferenceAct,SIGNAL(triggered()),this,SLOT(perference()));
+}
+
+/* 构建菜单功能实现 */
+void MainWindow::setupBuildMenu()
+{
+    buildMenu = new QMenu(tr("&Build"), menuBar);
+    menuBar->addMenu(buildMenu);
+
+    //编译
+    compileAct = new QAction(QIcon(tr(":images/compile.png")), tr("&Copy"), this);
+    compileAct->setShortcut(QKeySequence::Copy);
+    buildMenu->addAction(compileAct);
+    buildToolBar->addAction(compileAct);
+
+    //部署
+    deployAct = new QAction(QIcon(tr(":images/editcut.png")), tr("&Cut"), this);
+    deployAct->setShortcut(QKeySequence::Cut);
+    buildMenu->addAction(deployAct);
+    buildToolBar->addAction(deployAct);
+
+    //运行
+    runAct = new QAction(QIcon(tr(":images/editpaste.png")), tr("&Paste"), this);
+    runAct->setShortcut(QKeySequence::Paste);
+    buildMenu->addAction(runAct);
+    buildToolBar->addAction(runAct);
+
+    setupBuildActions();
+}
+
+/* 构建菜单Action设置 */
+void MainWindow::setupBuildActions()
+{
+//    connect(compileAct, SIGNAL(triggered()), EDITOR,SLOT(copy()));
+//    connect(deployAct,SIGNAL(triggered()),EDITOR,SLOT(paste()));
+//    connect(runAct,SIGNAL(triggered()),EDITOR,SLOT(undo()));
 }
 
 //设置文本颜色
