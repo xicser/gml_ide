@@ -21,6 +21,7 @@
 #include <QActionGroup>
 #include <QTextCharFormat>
 #include <QMimeData>
+#include <QDesktopWidget>
 
 MainWindow::MainWindow(Config *config, QWidget *parent) :
     QMainWindow(parent), config(config)
@@ -92,6 +93,16 @@ void MainWindow::init()
 
     perferenceDialog = new PerferenceDialog(config, this);
     perferenceDialog->setVisible(false);
+
+    //全屏显示
+    setWindowState(Qt::WindowMaximized);
+
+    //设置窗口最小大小
+    QDesktopWidget *desktopWidget = QApplication::desktop();
+    QRect clientRect = desktopWidget->availableGeometry();
+    int screenXSize = clientRect.width();
+    int screenYSize = clientRect.height();
+    setMinimumSize(screenXSize * 0.5, screenYSize * 0.5);
 }
 
 //关闭事件
@@ -616,7 +627,7 @@ void MainWindow::gotoLine()
         gotoLineDialog->activateWindow();
     else
         gotoLineDialog->show();
-    connect(gotoLineDialog,SIGNAL(gotoLine(int)),EDITOR,SLOT(gotoLine(int)));
+    connect(gotoLineDialog, SIGNAL(gotoLine(int)), EDITOR, SLOT(gotoLine(int)));
 }
 
 //编辑菜单功能实现
@@ -722,20 +733,17 @@ void MainWindow::setupBuildMenu()
     menuBar->addMenu(buildMenu);
 
     //编译
-    compileAct = new QAction(QIcon(tr(":images/compile.png")), tr("&Copy"), this);
-    compileAct->setShortcut(QKeySequence::Copy);
+    compileAct = new QAction(QIcon(tr(":images/compile.png")), tr("&Compile"), this);
     buildMenu->addAction(compileAct);
     buildToolBar->addAction(compileAct);
 
     //部署
-    deployAct = new QAction(QIcon(tr(":images/editcut.png")), tr("&Cut"), this);
-    deployAct->setShortcut(QKeySequence::Cut);
+    deployAct = new QAction(QIcon(tr(":images/deploy.png")), tr("&Deploy"), this);
     buildMenu->addAction(deployAct);
     buildToolBar->addAction(deployAct);
 
     //运行
-    runAct = new QAction(QIcon(tr(":images/editpaste.png")), tr("&Paste"), this);
-    runAct->setShortcut(QKeySequence::Paste);
+    runAct = new QAction(QIcon(tr(":images/run.png")), tr("&Run"), this);
     buildMenu->addAction(runAct);
     buildToolBar->addAction(runAct);
 

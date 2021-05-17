@@ -1,15 +1,16 @@
 #include "notepad.h"
 #include <QEvent>
-#include<QResizeEvent>
-#include<QPaintEvent>
-#include<QKeyEvent>
-#include<QMouseEvent>
-#include<QContextMenuEvent>
+#include <QResizeEvent>
+#include <QPaintEvent>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QContextMenuEvent>
 #include <QFont>
 #include <QMenu>
 #include <QToolTip>
-#include<QAction>
+#include <QAction>
 #include <QPainter>
+#include <QDebug>
 
 NotePad::NotePad(Config *config, QWidget *parent) :
     QPlainTextEdit(parent), config(config)
@@ -707,6 +708,19 @@ void NotePad::gotoLine(int lineNumber)
     QTextBlock block = document()->findBlockByLineNumber(lineNumber - 1);
     cursor.setPosition(block.position());
     setTextCursor(cursor);
+
+//    //把当前行设置位高亮
+//    QBrush brush;
+//    brush.setColor(QColor(217, 235, 249));
+//    QList<QTextEdit::ExtraSelection> extraSelections;           //提供一种方式显示选择的文本
+//    extraSelections = this->extraSelections();                  //获取之前高亮的设置
+//    QTextEdit::ExtraSelection selection;
+//    selection.format.setBackground(brush);
+//    selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+//    selection.cursor = this->textCursor();
+//    selection.cursor.movePosition(QTextCursor::Up);             //光标移动到某一行。此处移动到上一行，上一行将高亮。
+//    extraSelections.append(selection);
+//    this->setExtraSelections(extraSelections);//设置高亮
 }
 
 NotePad::~NotePad()

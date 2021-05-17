@@ -26,79 +26,75 @@ class MainWindow: public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit MainWindow(Config *, QWidget * = 0);
+    MainWindow(Config *, QWidget * = 0);
     ~MainWindow();
 
-signals:
-
-public slots:
-
 private slots:
-    void currentChanged(int index); //tab发生改变时执行的槽
-    void modificationChanged(bool changed); //文档发生改变
-    void selectionChanged();    //文档选中状态发生改变
-    void blockCountChanged(int blockCount);   //文档段落发生改变
-    void openFile();    //打开文件
-    void openFile(QString FileName);    //打开文件
-    void newFile(); //新建文件
-    bool fileSaveAs(int index); //文件另存为（保存指定文件）
-    bool fileSave(int index);   //保存文件（保存指定文件）
-    bool fileSaveAs();  //文件另存为（保存当前文件）
-    bool fileSave();    //保存文件（保存当前文件）
-    bool fileSaveAll(); //保存所有文件
-    void filePrint();   //打印文件
-    void filePrintPreview(); //打印预览
-    void filePrintPdf(); //输出成PDF
-    void printPreview(QPrinter *); //打印预览子函数
-    void fileClose(int index);   //关闭文件（指定文件）
-    void fileClose();   //关闭文件（当前文件）
-    void fileCloseAll();    //关闭所有文件
+    void currentChanged(int index);             //tab发生改变时执行的槽
+    void modificationChanged(bool changed);     //文档发生改变
+    void selectionChanged();                    //文档选中状态发生改变
+    void blockCountChanged(int blockCount);     //文档段落发生改变
+    void openFile();                            //打开文件
+    void openFile(QString FileName);            //打开文件
+    void newFile();                             //新建文件
+    bool fileSaveAs(int index);                 //文件另存为（保存指定文件）
+    bool fileSave(int index);                   //保存文件（保存指定文件）
+    bool fileSaveAs();                          //文件另存为（保存当前文件）
+    bool fileSave();                            //保存文件（保存当前文件）
+    bool fileSaveAll();                         //保存所有文件
+    void filePrint();                           //打印文件
+    void filePrintPreview();                    //打印预览
+    void filePrintPdf();                        //输出成PDF
+    void printPreview(QPrinter *);              //打印预览子函数
+    void fileClose(int index);                  //关闭文件（指定文件）
+    void fileClose();                           //关闭文件（当前文件）
+    void fileCloseAll();                        //关闭所有文件
 
-    void gotoLine();  //转到行
-    void search();  //查找
-    void perference();  //首选项
+    void gotoLine();                            //转到行
+    void search();                              //查找
+    void perference();                          //首选项
 
-    void textColor(); //设置文本颜色
-    void textFont(); //设置文本字体
-    void textFontFamily(const QString& font); //设置文本字体（通过字体组合框）
-    void textSize(const QString &size); //设置字体大小
-    void textStyle(int index); //设置文本风格（根据下拉列表框）
-    void textStyle();    //设置文本风格
-    void updateTextStyleActs(QString style);   //设置字体风格Action是否被check
+    void textColor();                           //设置文本颜色
+    void textFont();                            //设置文本字体
+    void textFontFamily(const QString& font);   //设置文本字体（通过字体组合框）
+    void textSize(const QString &size);         //设置字体大小
+    void textStyle(int index);                  //设置文本风格（根据下拉列表框）
+    void textStyle();                           //设置文本风格
+    void updateTextStyleActs(QString style);    //设置字体风格Action是否被check
 
-    void nextWindow(); //下一个窗口
-    void previousWindow(); //前一个窗口
-    void currentAllWindow();    //当前所有窗口
-    void setCurrentWindow(QAction *a);    //窗口菜单中的项被选中时触发的槽
-    void openRecentFile();  //打开最近的文档
-    void updateRecentFiles();    //更新最近打开的文件菜单
+    void nextWindow();                          //下一个窗口
+    void previousWindow();                      //前一个窗口
+    void currentAllWindow();                    //当前所有窗口
+    void setCurrentWindow(QAction *a);          //窗口菜单中的项被选中时触发的槽
+    void openRecentFile();                      //打开最近的文档
+    void updateRecentFiles();                   //更新最近打开的文件菜单
 
-    void about();   //关于本软件
+    void about();                               //关于本软件
 
 private:
-    Config *config; //编辑器设置
-    QTabWidget *tabWidget;  //Tab栏
-    SearchDialog *searchDialog; //查找/替换框
-    GoToLineDialog *gotoLineDialog;   //转到行
-    PerferenceDialog *perferenceDialog; //首选项
-    int newNumber;  //新建文件的数目
-    QStringList openedFiles;    //打开的文件
-    QList<QAction *> recentFileActs; //最近打开的文件
-    QActionGroup *openedFilesGrp; //文件窗口Action Group
+    Config *config;                             //编辑器设置
+    QTabWidget *tabWidget;                      //Tab栏
+    SearchDialog *searchDialog;                 //查找/替换框
+    GoToLineDialog *gotoLineDialog;             //转到行
+    PerferenceDialog *perferenceDialog;         //首选项
+    int newNumber;                              //新建文件的数目
+    QStringList openedFiles;                    //打开的文件
+    QList<QAction *> recentFileActs;            //最近打开的文件
+    QActionGroup *openedFilesGrp;               //文件窗口Action Group
 
-    QMenuBar *menuBar;  //菜单栏
-    QToolBar *topToolBar;       //第一个工具栏
-    QToolBar *bottomToolBar;    //第二个工具栏
-    QToolBar *buildToolBar;     //编译构建工具栏
+    QMenuBar *menuBar;                          //菜单栏
+    QToolBar *topToolBar;                       //第一个工具栏
+    QToolBar *bottomToolBar;                    //第二个工具栏
+    QToolBar *buildToolBar;                     //编译构建工具栏
 
-    QComboBox *comboStyle;  //字体风格组合框
-    QFontComboBox *comboFont;   //字体组合框
-    QComboBox *comboSize;   //字体大小组合框
+    QComboBox *comboStyle;                      //字体风格组合框
+    QFontComboBox *comboFont;                   //字体组合框
+    QComboBox *comboSize;                       //字体大小组合框
 
-    QMenu *fileMenu;    //文件菜单
-    QAction *openAct;   //打开文件
-    QAction *newAct;    //新建文件
-    QAction *saveAct;   //保存文件
+    QMenu *fileMenu;                            //文件菜单
+    QAction *openAct;                           //打开文件
+    QAction *newAct;                            //新建文件
+    QAction *saveAct;                           //保存文件
     QAction *saveAsAct;     //文件另存为
     QAction *saveAllAct;    //保存所有
     QAction *printAct;  //打印
