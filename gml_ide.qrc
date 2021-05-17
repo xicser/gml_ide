@@ -1,0 +1,44 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resource/checked.png</file>
+        <file>resource/closeall.png</file>
+        <file>resource/compile.png</file>
+        <file>resource/deploy.png</file>
+        <file>resource/editcopy.png</file>
+        <file>resource/editcut.png</file>
+        <file>resource/editfind.png</file>
+        <file>resource/editpaste.png</file>
+        <file>resource/editredo.png</file>
+        <file>resource/editselectall.png</file>
+        <file>resource/editundo.png</file>
+        <file>resource/exportpdf.png</file>
+        <file>resource/fileclose.png</file>
+        <file>resource/fileexit.png</file>
+        <file>resource/filenew.png</file>
+        <file>resource/fileopen.png</file>
+        <file>resource/fileprint.png</file>
+        <file>resource/filesave.png</file>
+        <file>resource/filesaveas.png</file>
+        <file>resource/helpabout.png</file>
+        <file>resource/helpaboutqt.png</file>
+        <file>resource/logo32.png</file>
+        <file>resource/lowercase.png</file>
+        <file>resource/next.png</file>
+        <file>resource/notepad.png</file>
+        <file>resource/previous.png</file>
+        <file>resource/printpreview.png</file>
+        <file>resource/run.png</file>
+        <file>resource/saveall.png</file>
+        <file>resource/textbold.png</file>
+        <file>resource/textcenter.png</file>
+        <file>resource/textfont.png</file>
+        <file>resource/textitalic.png</file>
+        <file>resource/textjustify.png</file>
+        <file>resource/textleft.png</file>
+        <file>resource/textright.png</file>
+        <file>resource/textunder.png</file>
+        <file>resource/uppercase.png</file>
+        <file>resource/zoomin.png</file>
+        <file>resource/zoomout.png</file>
+    </qresource>
+</RCC>

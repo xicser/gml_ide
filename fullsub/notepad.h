@@ -3,7 +3,6 @@
 
 #include <QPlainTextEdit>
 #include <QTextBlock>
-#include "config.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -42,7 +41,7 @@ public:
 
     const static int StateShift = 8;
 public:
-    NotePad(Config *, QWidget *parent = 0);
+    NotePad(QWidget *parent = 0);
     ~NotePad();
 
 public slots:
@@ -68,8 +67,6 @@ private slots:
     } //文本的段落数发生改变时触发的槽
     void contentsChange(int, int, int); //文本内容发生改变触发的槽
     void ensureCursorVisible(); //光标可见
-
-    void reconfig(int = (Config::Init | Config::Editor));   //重新配置
 
 private:
     void resizeEvent(QResizeEvent *);
@@ -105,8 +102,6 @@ private:
     int foldBoxWidth;
     int foldBoxIndent;
     int foldBoxLength;
-
-    Config *config;
 };
 
 #endif // NOTEPAD_H

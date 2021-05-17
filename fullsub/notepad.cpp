@@ -12,11 +12,9 @@
 #include <QPainter>
 #include <QDebug>
 
-NotePad::NotePad(Config *config, QWidget *parent) :
-    QPlainTextEdit(parent), config(config)
+NotePad::NotePad(QWidget *parent) :
+    QPlainTextEdit(parent)
 {
-    reconfig();
-
     extraArea = new QWidget(this);
     extraArea->installEventFilter(this);
     extraArea->setCursor(Qt::PointingHandCursor);
@@ -40,7 +38,6 @@ NotePad::NotePad(Config *config, QWidget *parent) :
     connect(this, SIGNAL(cursorPositionChanged()), SLOT(ensureCursorVisible()));
     connect(this, SIGNAL(blockCountChanged(int)), SLOT(blockCountChanged(int)));
     connect(document(), SIGNAL(contentsChange(int, int, int)), SLOT(contentsChange(int, int, int)));
-    connect(config, SIGNAL(reread(int)), SLOT(reconfig(int)));
     connect(this, SIGNAL(updateRequest(QRect, int)), extraArea, SLOT(update()));
 }
 
@@ -67,7 +64,8 @@ void NotePad::paintEvent(QPaintEvent *event)
             continue;
         rect = blockBoundingGeometry(block).translated(contentOffset());
         QTextLine line = block.layout()->lineAt(0);
-        if (config->whitespaces)
+        //if (config->whitespaces)
+        if (1)
         {
             QString txt = block.text();
             for (int i = 0; i < txt.length(); i++)
@@ -99,80 +97,80 @@ void NotePad::paintEvent(QPaintEvent *event)
 
 void NotePad::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Return && event->modifiers() == Qt::SHIFT)
-        return;
+//    if (event->key() == Qt::Key_Return && event->modifiers() == Qt::SHIFT)
+//        return;
 
-    if (event->key() == Qt::Key_Backspace && config->backUnindent)
-    {
-        QTextCursor cursor = textCursor();
+//    if (event->key() == Qt::Key_Backspace && config->backUnindent)
+//    {
+//        QTextCursor cursor = textCursor();
 
-        if (!cursor.hasSelection() && !cursor.atBlockStart()
-                && cursor.block().text().left(cursor.positionInBlock()).trimmed().isEmpty())
-        {
-            cursor.movePosition(QTextCursor::PreviousCharacter,
-                                QTextCursor::KeepAnchor,
-                                qMin(config->indentSize, cursor.positionInBlock()));
-            cursor.removeSelectedText();
-            return;
-        }
-    }
+//        if (!cursor.hasSelection() && !cursor.atBlockStart()
+//                && cursor.block().text().left(cursor.positionInBlock()).trimmed().isEmpty())
+//        {
+//            cursor.movePosition(QTextCursor::PreviousCharacter,
+//                                QTextCursor::KeepAnchor,
+//                                qMin(config->indentSize, cursor.positionInBlock()));
+//            cursor.removeSelectedText();
+//            return;
+//        }
+//    }
 
-    if (event->key() == Qt::Key_Tab && config->tabIndents)
-    {
-        QTextCursor cursor = textCursor();
+//    if (event->key() == Qt::Key_Tab && config->tabIndents)
+//    {
+//        QTextCursor cursor = textCursor();
 
-        if (cursor.hasSelection())
-        {
+//        if (cursor.hasSelection())
+//        {
 
-            QTextBlock block = document()->findBlock(cursor.selectionStart());
+//            QTextBlock block = document()->findBlock(cursor.selectionStart());
 
-            int end = document()->findBlock(cursor.selectionEnd()).blockNumber();
+//            int end = document()->findBlock(cursor.selectionEnd()).blockNumber();
 
-            if (end - block.blockNumber())
-            {
-                cursor.beginEditBlock();
-                do
-                {
-                    cursor.setPosition(block.position(), QTextCursor::MoveAnchor);
-                    cursor.insertText(QString().fill(' ', config->indentSize));
-                } while ((block = block.next()).isValid()
-                         && block.blockNumber() <= end);
-                cursor.endEditBlock();
-                return;
-            }
+//            if (end - block.blockNumber())
+//            {
+//                cursor.beginEditBlock();
+//                do
+//                {
+//                    cursor.setPosition(block.position(), QTextCursor::MoveAnchor);
+//                    cursor.insertText(QString().fill(' ', config->indentSize));
+//                } while ((block = block.next()).isValid()
+//                         && block.blockNumber() <= end);
+//                cursor.endEditBlock();
+//                return;
+//            }
 
-        }
-        else if (textCursor().block().text().left(textCursor().positionInBlock()).trimmed().isEmpty())
-        {
-            textCursor().insertText(QString().fill(' ', config->indentSize));
-            return;
-        }
-    }
+//        }
+//        else if (textCursor().block().text().left(textCursor().positionInBlock()).trimmed().isEmpty())
+//        {
+//            textCursor().insertText(QString().fill(' ', config->indentSize));
+//            return;
+//        }
+//    }
 
-    if (event->key() == Qt::Key_Tab && config->spaceTabs)
-    {
-        textCursor().insertText(QString().fill(' ', config->tabSize));
-        return;
-    }
+//    if (event->key() == Qt::Key_Tab && config->spaceTabs)
+//    {
+//        textCursor().insertText(QString().fill(' ', config->tabSize));
+//        return;
+//    }
 
-    QPlainTextEdit::keyPressEvent(event);
+//    QPlainTextEdit::keyPressEvent(event);
 
-    if (event->key() == Qt::Key_Return && config->autoIndent)
-    {
-        int state = textCursor().block().userState();
+//    if (event->key() == Qt::Key_Return && config->autoIndent)
+//    {
+//        int state = textCursor().block().userState();
 
-        if (!(state & Error) && (state & Nested))
-        {
-            QString txt = textCursor().block().previous().text();
-            int i = 0;
-            while (txt[i].isSpace())
-                ++i;
-            int previousBlockState = textCursor().block().previous().userState();
-            if (!(previousBlockState & Error) && previousBlockState & Begin)
-                i += config->indentSize;
-            textCursor().insertText(QString().fill(' ', i));
-        }
-    }
+//        if (!(state & Error) && (state & Nested))
+//        {
+//            QString txt = textCursor().block().previous().text();
+//            int i = 0;
+//            while (txt[i].isSpace())
+//                ++i;
+//            int previousBlockState = textCursor().block().previous().userState();
+//            if (!(previousBlockState & Error) && previousBlockState & Begin)
+//                i += config->indentSize;
+//            textCursor().insertText(QString().fill(' ', i));
+//        }
+//    }
 }
 
 void NotePad::mouseMoveEvent(QMouseEvent *event)
@@ -319,13 +317,13 @@ void NotePad::extraAreaPaintEvent()
         }
 
         painter.setFont(font);
-        if (config->showLineNumber)
-        {
-            painter.drawText(0, y, lineNumWidth, fontMetrics().height(),
-                             Qt::AlignRight, QString::number(block.blockNumber() + 1));
+//        if (config->showLineNumber)
+//        {
+//            painter.drawText(0, y, lineNumWidth, fontMetrics().height(),
+//                             Qt::AlignRight, QString::number(block.blockNumber() + 1));
 
-            painter.setPen(Qt::gray);
-        }
+//            painter.setPen(Qt::gray);
+//        }
 
         int state = block.userState();
 
@@ -602,38 +600,6 @@ void NotePad::ensureCursorVisible()
 
         cursor.setPosition(block.position(), QTextCursor::MoveAnchor);
         setTextCursor(cursor);
-    }
-}
-
-//重新配置
-void NotePad::reconfig(int receiver)
-{
-    if (!(receiver & Config::Editor))
-        return;
-
-    QFont font(config->fontFamily, config->fontSize);
-    font.setFixedPitch(true);
-
-    foldBoxWidth = config->fontSize;
-    foldBoxIndent = foldBoxWidth / 2;
-    foldBoxLength = foldBoxWidth / 6;
-
-    setFont(font);
-    QToolTip::setFont(font);
-
-    setTabStopWidth(FONTWIDTH * config->tabSize);
-
-    if (!(receiver & Config::Init))
-    {
-
-        QTextBlock block = document()->firstBlock();
-
-        do
-        {
-            block.setUserState(block.userState() | Rehighligh);
-        } while ((block = block.next()).isValid());
-
-        FULLRESIZE;
     }
 }
 

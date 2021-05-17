@@ -1,21 +1,21 @@
 #include "searchdialog.h"
 
-SearchDialog::SearchDialog(Config *config, QWidget *parent) :
-    QWidget(parent), config(config)
+SearchDialog::SearchDialog(QWidget *parent) :
+    QWidget(parent)
 {
     setupUi(this);
     setWindowIcon(QIcon(tr(":images/notepad.png")));
     setWindowTitle(tr("Search & Replace"));
-    findCombo->setMaxCount(config->maxHistory);
-    findCombo->addItems(config->findHistory);
+//    findCombo->setMaxCount(config->maxHistory);
+//    findCombo->addItems(config->findHistory);
     findCombo->setCurrentIndex(-1);
 
-    replaceCombo->setMaxCount(config->maxHistory);
-    replaceCombo->addItems(config->replaceHistory);
-    replaceCombo->setCurrentIndex(-1);
+//    replaceCombo->setMaxCount(config->maxHistory);
+//    replaceCombo->addItems(config->replaceHistory);
+//    replaceCombo->setCurrentIndex(-1);
 
-    matchCaseCheck->setChecked(config->matchCase);
-    regExpCheck->setChecked(config->regExp);
+//    matchCaseCheck->setChecked(config->matchCase);
+//    regExpCheck->setChecked(config->regExp);
 
     connect(findNextButton, SIGNAL(clicked()), SLOT(search()));
     connect(findPreviousButton, SIGNAL(clicked()), SLOT(search()));
@@ -26,18 +26,18 @@ SearchDialog::SearchDialog(Config *config, QWidget *parent) :
 
 SearchDialog::~SearchDialog()
 {
-    config->matchCase = matchCaseCheck->isChecked();
-    config->regExp = regExpCheck->isChecked();
+//    config->matchCase = matchCaseCheck->isChecked();
+//    config->regExp = regExpCheck->isChecked();
 
-    config->findHistory.clear();
+//    config->findHistory.clear();
 
-    for (int i = 0; i < findCombo->count(); i++)
-        config->findHistory << findCombo->itemText(i);
+//    for (int i = 0; i < findCombo->count(); i++)
+//        config->findHistory << findCombo->itemText(i);
 
-    config->replaceHistory.clear();
+//    config->replaceHistory.clear();
 
-    for (int i = 0; i < replaceCombo->count(); i++)
-        config->replaceHistory << replaceCombo->itemText(i);
+//    for (int i = 0; i < replaceCombo->count(); i++)
+//        config->replaceHistory << replaceCombo->itemText(i);
 }
 
 //查找

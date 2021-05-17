@@ -3,14 +3,13 @@
 
 #include <QWidget>
 #include "ui_searchdialog.h"
-#include "config.h"
 
 class SearchDialog: public QWidget, private Ui::SearchDialog
 {
     Q_OBJECT
 
 public:
-    SearchDialog(Config *, QWidget * = 0);
+    SearchDialog(QWidget * = 0);
     ~SearchDialog();
 
 signals:
@@ -24,8 +23,6 @@ private slots:
 
 private:
     void update(QComboBox *); //更新查找/替换历史
-
-    Config *config;
 };
 
 #endif // SEARCHDIALOG_H
