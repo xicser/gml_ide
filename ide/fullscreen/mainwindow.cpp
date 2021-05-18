@@ -23,6 +23,7 @@
 #include <QMimeData>
 #include <QDesktopWidget>
 #include <QApplication>
+#include <QDockWidget>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -33,7 +34,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setupBuildMenu();
     setupWindowMenu();
     setupHelpMenu();
-    setCentralWidget(tabWidget);
+
+
 }
 
 MainWindow::~MainWindow()
@@ -44,6 +46,11 @@ MainWindow::~MainWindow()
 //初始化
 void MainWindow::init()
 {
+    //必须设置这个, 否则QDockWidget无法设置大小
+    centralWidget = new QWidget(this);
+    this->setCentralWidget(centralWidget);
+
+    //菜单栏, 工具栏
     menuBar = new QMenuBar(this);
     topToolBar = new QToolBar(this);
     topToolBar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
@@ -54,10 +61,32 @@ void MainWindow::init()
     addToolBarBreak(Qt::TopToolBarArea);
     addToolBar(buildToolBar);
 
-    tabWidget = new QTabWidget(this);
-    tabWidget->setMovable(true);
-    tabWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    tabWidget->setTabsClosable(true);
+    //左侧树停靠结构
+    treeDirDock = new QDockWidget(tr("files"), this);
+    treeDirDock->setFeatures(QDockWidget::DockWidgetMovable);
+    treeDirDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+    treeDirView = new TreeLayerView(treeDirDock);
+    treeDirDock->setWidget(treeDirView);
+    this->addDockWidget(Qt::LeftDockWidgetArea, treeDirDock);
+
+    //log输出框停靠结构
+    logDock = new QDockWidget(tr("output"), this);
+    logDock->setFeatures(QDockWidget::DockWidgetMovable);
+    logDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+    logTextEdit = new LogTextEdit(logDock);
+    logDock->setWidget(logTextEdit);
+    this->addDockWidget(Qt::BottomDockWidgetArea, logDock);
+
+    //tabWidget停靠结构
+    tabDock = new QDockWidget(this);
+    tabDock->setFeatures(QDockWidget::DockWidgetMovable);
+    tabDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+    notepadTabWidget = new NotePadTabWidget(tabDock);
+    tabDock->setWidget(notepadTabWidget);
+    notepadTabWidget->setMovable(true);
+    notepadTabWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    notepadTabWidget->setTabsClosable(true);
+    this->addDockWidget(Qt::RightDockWidgetArea, tabDock);
 
     //全屏显示
     setWindowState(Qt::WindowMaximized);
@@ -65,26 +94,29 @@ void MainWindow::init()
     //设置窗口最小大小
     QDesktopWidget *desktopWidget = QApplication::desktop();
     QRect clientRect = desktopWidget->availableGeometry();
-    int screenXSize = clientRect.width();
-    int screenYSize = clientRect.height();
+    screenXSize = clientRect.width();
+    screenYSize = clientRect.height();
     setMinimumSize(screenXSize * 0.5, screenYSize * 0.5);
+
+
+    connect(treeDirDock, &QDockWidget::dockLocationChanged, this, &MainWindow::slotDockLocationChanged);
+    connect(logDock, &QDockWidget::dockLocationChanged, this, &MainWindow::slotDockLocationChanged);
+    connect(tabDock, &QDockWidget::dockLocationChanged, this, &MainWindow::slotDockLocationChanged);
+
+    textEdit = new QTextEdit(this);
+    textEdit->setText("asdf");
+    textEdit->show();
 }
 
-////关闭事件
-//void MainWindow::closeEvent(QCloseEvent *event)
-//{
-//    for (int i = 0; i < tabWidget->count(); i++)
-//    {
-//        tabWidget->setCurrentIndex(i);
-//        if (!maybeSave(i))
-//        {
-//            event->ignore();
-//            return;
-//        }
-//    }
-//    event->accept();
-//}
+void MainWindow::slotDockLocationChanged(Qt::DockWidgetArea area)
+{
+    textEdit->setGeometry(centralWidget->geometry());
+}
 
+void MainWindow::mouseReleaseEvent(QMouseEvent *me)
+{
+    qDebug() << "mouse";
+}
 
 //文件菜单功能实现
 void MainWindow::setupFileMenu()
