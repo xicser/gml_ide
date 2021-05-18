@@ -5,6 +5,7 @@
 #include <QPrinter>
 #include <QTextEdit>
 #include <QPlainTextEdit>
+#include <QStatusBar>
 #include "fullsub/treelayerview.h"
 #include "fullsub/logtextedit.h"
 #include "fullsub/notepadtabwidget.h"
@@ -17,18 +18,10 @@ public:
     ~MainWindow();
 
 private:
-
-    int    screenXSize, screenYSize;            //屏幕可用尺寸
-    int    menuBarHeight;                       //菜单栏高度
-    int    toolBarHeight;                       //工具栏高度
-    int    treeDirWidth, treeDirHeight;         //树形目录宽度, 高度
-
-
-    QWidget  *centralWidget;                    //centralWidget
-
     QMenuBar *menuBar;                          //菜单栏
     QToolBar *topToolBar;                       //按钮工具栏
     QToolBar *buildToolBar;                     //编译构建工具栏
+    QStatusBar *statusBar;                      //状态栏
 
     QMenu   *fileMenu;                          //文件菜单
     QAction *openAct;                           //打开文件
@@ -74,10 +67,7 @@ private:
     TreeLayerView *treeDirView;                 //树文件目录结构
     QDockWidget   *logDock;                     //log输出停靠
     LogTextEdit   *logTextEdit;                 //log输出文本框
-    QDockWidget   *tabDock;                     //tab标签页停靠
     NotePadTabWidget  *notepadTabWidget;        //文本Tab标签页
-
-    QTextEdit *textEdit;
 
     void init();                                //初始化
     void setupFileMenu();                       //文件菜单功能实现
@@ -107,11 +97,6 @@ private:
     void search();                              //查找
     void about();                               //关于本软件
 
-private slots:
-    void slotDockLocationChanged(Qt::DockWidgetArea area);
-
-protected:
-    void mouseReleaseEvent(QMouseEvent *me);
 };
 
 #endif // MAINWINDOW_H
