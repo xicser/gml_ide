@@ -46,6 +46,9 @@ MainWindow::~MainWindow()
 //初始化
 void MainWindow::init()
 {
+    setWindowIcon(QIcon(":/resource/notepad.png"));
+    setWindowTitle("GML Integrated Development Environment");
+
     //菜单栏, 工具栏, 状态栏
     menuBar = new QMenuBar(this);
     statusBar = new QStatusBar(this);
