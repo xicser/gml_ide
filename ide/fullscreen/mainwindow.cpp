@@ -35,7 +35,11 @@ MainWindow::MainWindow(QWidget *parent) :
     setupWindowMenu();
     setupHelpMenu();
 
-
+    setupFileActions();
+    setupEditActions();
+    setupBuildActions();
+    setupWindowActions();
+    setupHelpActions();
 }
 
 MainWindow::~MainWindow()
@@ -46,6 +50,8 @@ MainWindow::~MainWindow()
 //初始化
 void MainWindow::init()
 {
+    tabInfoList.clear();
+
     setWindowIcon(QIcon(":/resource/notepad.png"));
     setWindowTitle("GML Integrated Development Environment");
 
@@ -79,11 +85,11 @@ void MainWindow::init()
     this->addDockWidget(Qt::BottomDockWidgetArea, logDock);
 
     //tab标签页
-    notepadTabWidget = new NotePadTabWidget(this);
-    notepadTabWidget->setMovable(true);
-    notepadTabWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    notepadTabWidget->setTabsClosable(true);
-    this->setCentralWidget(notepadTabWidget);
+    tabWidget = new QTabWidget(this);
+    tabWidget->setMovable(true);
+    tabWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    tabWidget->setTabsClosable(true);
+    this->setCentralWidget(tabWidget);
 
     //全屏显示
     setWindowState(Qt::WindowMaximized);
@@ -260,39 +266,6 @@ void MainWindow::setupEditMenu()
     menuBar->addMenu(editMenu);
 }
 
-//文件菜单Action设置
-void MainWindow::setupFileActions()
-{
-    connect(openAct, SIGNAL(triggered()), this, SLOT(openFile()));
-    connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
-    connect(saveAct, SIGNAL(triggered()), this, SLOT(fileSave()));
-    connect(saveAsAct, SIGNAL(triggered()), this, SLOT(fileSaveAs()));
-    connect(saveAllAct, SIGNAL(triggered()), this, SLOT(fileSaveAll()));
-#ifndef QT_NO_PRINTER
-    connect(printAct, SIGNAL(triggered()), this, SLOT(filePrint()));
-    connect(printPreviewAct, SIGNAL(triggered()), this,
-            SLOT(filePrintPreview()));
-    connect(exportPdfAct, SIGNAL(triggered()), this, SLOT(filePrintPdf()));
-#endif
-    connect(closeAct, SIGNAL(triggered()), this, SLOT(fileClose()));
-    connect(closeAllAct, SIGNAL(triggered()), this, SLOT(fileCloseAll()));
-    connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
-}
-
-//编辑菜单Action设置
-void MainWindow::setupEditActions()
-{
-//    connect(copyAct, SIGNAL(triggered()), EDITOR,SLOT(copy()));
-//    connect(pasteAct,SIGNAL(triggered()),EDITOR,SLOT(paste()));
-//    connect(undoAct,SIGNAL(triggered()),EDITOR,SLOT(undo()));
-//    connect(redoAct,SIGNAL(triggered()),EDITOR,SLOT(redo()));
-//    connect(selectAllAct,SIGNAL(triggered()),EDITOR,SLOT(selectAll()));
-//    connect(upperCaseAct,SIGNAL(triggered()),EDITOR,SLOT(toUpperCase()));
-//    connect(lowerCaseAct,SIGNAL(triggered()),EDITOR,SLOT(toLowerCase()));
-//    connect(gotoLineAct,SIGNAL(triggered()),this,SLOT(gotoLine()));
-//    connect(findAct,SIGNAL(triggered()),this,SLOT(search()));
-}
-
 /* 构建菜单功能实现 */
 void MainWindow::setupBuildMenu()
 {
@@ -315,14 +288,6 @@ void MainWindow::setupBuildMenu()
     buildToolBar->addAction(runAct);
 }
 
-/* 构建菜单Action设置 */
-void MainWindow::setupBuildActions()
-{
-//    connect(compileAct, SIGNAL(triggered()), EDITOR,SLOT(copy()));
-//    connect(deployAct,SIGNAL(triggered()),EDITOR,SLOT(paste()));
-//    connect(runAct,SIGNAL(triggered()),EDITOR,SLOT(undo()));
-}
-
 //窗口菜单功能实现
 void MainWindow::setupWindowMenu()
 {
@@ -343,25 +308,13 @@ void MainWindow::setupWindowMenu()
 
     //最近关闭的文件
     recentlyFilesMenu = new QMenu(tr("Recently Files"), windowMenu);
-    //fillRecentFileActs();
     windowMenu->addMenu(recentlyFilesMenu);
 
     //当前所有窗口
     currentAllMenu = new QMenu(tr("Current Windows"), windowMenu);
     windowMenu->addMenu(currentAllMenu);
-    //openedFilesGrp = new QActionGroup(this);
-
     topToolBar->addSeparator();
     menuBar->addMenu(windowMenu);
-}
-
-//窗口菜单Action设置
-void MainWindow::setupWindowActions()
-{
-    connect(nextAct, SIGNAL(triggered()), SLOT(nextWindow()));
-    connect(previousAct, SIGNAL(triggered()), SLOT(previousWindow()));
-    connect(currentAllMenu, SIGNAL(aboutToShow()), SLOT(currentAllWindow()));
-    connect(recentlyFilesMenu, SIGNAL(aboutToShow()), SLOT(updateRecentFiles()));
 }
 
 //帮助菜单功能实现
@@ -377,10 +330,217 @@ void MainWindow::setupHelpMenu()
     menuBar->addMenu(helpMenu);
 }
 
+//文件菜单Action设置
+void MainWindow::setupFileActions()
+{
+    connect(openAct, &QAction::triggered, this, &MainWindow::openFile);
+    connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
+//    connect(saveAct, SIGNAL(triggered()), this, SLOT(fileSave()));
+//    connect(saveAsAct, SIGNAL(triggered()), this, SLOT(fileSaveAs()));
+//    connect(saveAllAct, SIGNAL(triggered()), this, SLOT(fileSaveAll()));
+//#ifndef QT_NO_PRINTER
+//    connect(printAct, SIGNAL(triggered()), this, SLOT(filePrint()));
+//    connect(printPreviewAct, SIGNAL(triggered()), this,
+//            SLOT(filePrintPreview()));
+//    connect(exportPdfAct, SIGNAL(triggered()), this, SLOT(filePrintPdf()));
+//#endif
+//    connect(closeAct, SIGNAL(triggered()), this, SLOT(fileClose()));
+//    connect(closeAllAct, SIGNAL(triggered()), this, SLOT(fileCloseAll()));
+//    connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
+}
+
+//编辑菜单Action设置
+void MainWindow::setupEditActions()
+{
+//    connect(copyAct, SIGNAL(triggered()), EDITOR,SLOT(copy()));
+//    connect(pasteAct,SIGNAL(triggered()),EDITOR,SLOT(paste()));
+//    connect(undoAct,SIGNAL(triggered()),EDITOR,SLOT(undo()));
+//    connect(redoAct,SIGNAL(triggered()),EDITOR,SLOT(redo()));
+//    connect(selectAllAct,SIGNAL(triggered()),EDITOR,SLOT(selectAll()));
+//    connect(upperCaseAct,SIGNAL(triggered()),EDITOR,SLOT(toUpperCase()));
+//    connect(lowerCaseAct,SIGNAL(triggered()),EDITOR,SLOT(toLowerCase()));
+//    connect(gotoLineAct,SIGNAL(triggered()),this,SLOT(gotoLine()));
+//    connect(findAct,SIGNAL(triggered()),this,SLOT(search()));
+}
+
+/* 构建菜单Action设置 */
+void MainWindow::setupBuildActions()
+{
+//    connect(compileAct, SIGNAL(triggered()), EDITOR,SLOT(copy()));
+//    connect(deployAct,SIGNAL(triggered()),EDITOR,SLOT(paste()));
+//    connect(runAct,SIGNAL(triggered()),EDITOR,SLOT(undo()));
+}
+
+//窗口菜单Action设置
+void MainWindow::setupWindowActions()
+{
+//    connect(nextAct, SIGNAL(triggered()), SLOT(nextWindow()));
+//    connect(previousAct, SIGNAL(triggered()), SLOT(previousWindow()));
+//    connect(currentAllMenu, SIGNAL(aboutToShow()), SLOT(currentAllWindow()));
+//    connect(recentlyFilesMenu, SIGNAL(aboutToShow()), SLOT(updateRecentFiles()));
+}
+
 //帮助Action设置
 void MainWindow::setupHelpActions()
 {
-    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
+    connect(aboutAct, &QAction::triggered, this, &MainWindow::about);
+}
+
+/* 打开文件 */
+void MainWindow::openFile()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("选择文本文件"), ".",
+             "text(*.cpp *.h *.txt);;all(*.*)");
+
+    if (filename.isEmpty()) {
+        return;
+    }
+
+    //判断该文件是否已经被打开?
+    bool hasOpened = false;
+    int index;
+    for (int i = 0; i < tabInfoList.size(); i++) {
+        if (tabInfoList[i].filePath == filename) {
+            hasOpened = true;
+            index = i;
+            break;
+        }
+    }
+    if (hasOpened == true) {
+        //聚焦到之前已经打开的文件tab上
+        this->tabWidget->setCurrentWidget(tabInfoList[index].notePadTab);
+        return;
+    }
+
+    //创建一个新的tab
+    Tab_Info_t tabInfo;
+    tabInfo.notePadTab = new NotePadTab(tabWidget);
+    connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
+    tabInfo.notePadTab->setEditStatus(false);
+    tabInfo.notePadTab->setFilePath(filename);
+    tabInfo.filePath = filename;
+    tabInfoList << tabInfo;
+
+    //获取文件名
+    QFileInfo info(filename);
+    QString title = info.fileName();
+
+    //打开文件(用流的方式)
+    QFile file(this);
+    file.setFileName(filename);
+    bool ret = file.open(QIODevice::ReadOnly);
+    if (ret == false) {
+        QMessageBox::warning(this, "错误", "打开出错！");
+        return;
+    }
+    QTextStream stream(&file);
+
+    //设置流的编码格式
+    //if (encoding == "UTF-8") {
+        stream.setCodec("UTF-8");
+    //} else if (encoding == "GB2312") {
+    //    stream.setCodec("GB18030");
+    //}
+    while (!stream.atEnd()) {
+        QString str = stream.readLine();
+        tabInfo.notePadTab->append(str);
+    }
+    file.close();
+
+    this->tabWidget->addTab(tabInfo.notePadTab, title);
+
+    //聚焦到刚刚打开的文件tab上
+    this->tabWidget->setCurrentWidget(tabInfo.notePadTab);
+}
+
+/* 新建文件 */
+void MainWindow::newFile()
+{
+    //创建一个新的tab
+    Tab_Info_t tabInfo;
+    tabInfo.notePadTab = new NotePadTab(tabWidget);
+    connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
+    tabInfo.notePadTab->setEditStatus(false);
+    tabInfo.filePath = "new";
+    tabInfo.notePadTab->setFilePath(tabInfo.filePath);
+    tabInfoList << tabInfo;
+
+    this->tabWidget->addTab(tabInfo.notePadTab, tr("new"));
+
+    //聚焦到刚刚新建的文件tab上
+    this->tabWidget->setCurrentWidget(tabInfo.notePadTab);
+}
+
+/* 保存文件 */
+bool MainWindow::fileSave(int index)
+{
+
+}
+
+/* 文件另存为 */
+bool MainWindow::fileSaveAs()
+{
+
+}
+
+/* 保存所有文件 */
+bool MainWindow::fileSaveAll()
+{
+
+}
+
+/* 打印文件 */
+void MainWindow::filePrint()
+{
+
+}
+
+/* 打印预览 */
+void MainWindow::filePrintPreview()
+{
+
+}
+
+/* 输出成PDF */
+void MainWindow::filePrintPdf()
+{
+
+}
+
+/* 打印预览子函数 */
+void MainWindow::printPreview(QPrinter *)
+{
+
+}
+
+/* 关闭文件（指定文件） */
+void MainWindow::fileClose(int index)
+{
+
+}
+
+/* 关闭文件（当前文件） */
+void MainWindow::fileClose()
+{
+
+}
+
+/* 关闭所有文件 */
+void MainWindow::fileCloseAll()
+{
+
+}
+
+/* 转到行 */
+void MainWindow::jumpLine()
+{
+
+}
+
+/* 查找 */
+void MainWindow::search()
+{
+
 }
 
 //关于本软件
@@ -389,4 +549,12 @@ void MainWindow::about()
     QMessageBox::about(this, tr("About"), tr("This example demonstrates Qt's "
                                              "rich text editing facilities in action, providing an example "
                                              "document for you to experiment with."));
+}
+
+/* 接收某个notePadTab内容改变的槽 */
+void MainWindow::slotNotePadContentChanged(NotePadTab *notePadTab)
+{
+    int index = this->tabWidget->indexOf(notePadTab);
+    QString tabStr = notePadTab->getFileName() + " *";
+    this->tabWidget->setTabText(index, tabStr);
 }

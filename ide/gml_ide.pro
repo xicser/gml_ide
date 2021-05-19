@@ -9,14 +9,14 @@ HEADERS += \
     fullscreen/mainwindow.h \
     fullsub/treelayerview.h \
     fullsub/logtextedit.h \
-    fullsub/notepadtabwidget.h
+    fullsub/notepadtab.h
 
 SOURCES += \
     fullscreen/mainwindow.cpp \
     main.cpp \
     fullsub/treelayerview.cpp \
     fullsub/logtextedit.cpp \
-    fullsub/notepadtabwidget.cpp
+    fullsub/notepadtab.cpp
 
 FORMS +=
 

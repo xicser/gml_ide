@@ -3,12 +3,11 @@
 
 #include <QMainWindow>
 #include <QPrinter>
-#include <QTextEdit>
-#include <QPlainTextEdit>
+#include <QTabWidget>
 #include <QStatusBar>
 #include "fullsub/treelayerview.h"
 #include "fullsub/logtextedit.h"
-#include "fullsub/notepadtabwidget.h"
+#include "fullsub/notepadtab.h"
 
 class MainWindow: public QMainWindow
 {
@@ -67,7 +66,7 @@ private:
     TreeLayerView *treeDirView;                 //树文件目录结构
     QDockWidget   *logDock;                     //log输出停靠
     LogTextEdit   *logTextEdit;                 //log输出文本框
-    NotePadTabWidget  *notepadTabWidget;        //文本Tab标签页
+    QTabWidget    *tabWidget;                   //文本Tab标签页
 
     void init();                                //初始化
     void setupFileMenu();                       //文件菜单功能实现
@@ -81,7 +80,15 @@ private:
     void setupWindowActions();                  //窗口菜单Action设置
     void setupHelpActions();                    //帮助菜单Action设置
 
-    void openFile(QString FileName);            //打开文件
+    //每个tab的信息
+    typedef struct {
+        QString filePath;                       //打开的文件路径
+        NotePadTab *notePadTab;                 //记事本指针
+    } Tab_Info_t;
+    QList<Tab_Info_t> tabInfoList;              //打开的tab信息list
+
+private slots:
+    void openFile();                            //打开文件
     void newFile();                             //新建文件
     bool fileSave(int index);                   //保存文件
     bool fileSaveAs();                          //文件另存为
@@ -97,6 +104,8 @@ private:
     void search();                              //查找
     void about();                               //关于本软件
 
+public slots:
+    void slotNotePadContentChanged(NotePadTab *notePadTab);     //接收某个notePadTab内容改变的槽
 };
 
 #endif // MAINWINDOW_H
