@@ -18,8 +18,12 @@ SOURCES += \
     fullsub/logtextedit.cpp \
     fullsub/notepadtab.cpp
 
+INCLUDEPATH += ./qscitinlla
+LIBS += -L./qscitinlla -lqscintilla2_qt5d
+
 FORMS +=
 
 RESOURCES += \
     gml_ide.qrc
 
+CONFIG += c++11

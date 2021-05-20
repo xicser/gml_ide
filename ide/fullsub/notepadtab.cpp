@@ -1,11 +1,14 @@
 #include "notepadtab.h"
 #include <QDebug>
 #include <QFileInfo>
+#include <Qsci/qsciscintilla.h>
+#include <Qsci/qscilexerpython.h>
+#include <Qsci/qsciapis.h>
 
 NotePadTab::NotePadTab(QWidget *parent) : QTextEdit(parent)
 {
 
-
+   // QsciScintilla;
 
 }
 
