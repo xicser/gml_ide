@@ -6,7 +6,7 @@ NotePadTab::NotePadTab(QWidget *parent) : QTextEdit(parent)
 {
 
 
-    connect(this->document(), &QTextDocument::contentsChanged, this, &NotePadTab::slotContentChanged);
+
 }
 
 QSize NotePadTab::sizeHint() const
@@ -48,7 +48,7 @@ QString NotePadTab::getFileName(void)
     return this->fileName;
 }
 
-/* 文本内容改变时, 调用该槽显示'*' */
+/* 文本内容改变时, 调用该槽发送signalContentHasChanged信号 */
 void NotePadTab::slotContentChanged(void)
 {
     this->isEditing = true;

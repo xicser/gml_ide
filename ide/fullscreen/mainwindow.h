@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QObject>
 #include <QMainWindow>
 #include <QPrinter>
 #include <QTabWidget>
@@ -90,9 +91,9 @@ private:
 private slots:
     void openFile();                            //打开文件
     void newFile();                             //新建文件
-    bool fileSave(int index);                   //保存文件
-    bool fileSaveAs();                          //文件另存为
-    bool fileSaveAll();                         //保存所有文件
+    void fileSave();                            //保存文件
+    void fileSaveAs();                          //文件另存为
+    void fileSaveAll();                         //保存所有文件
     void filePrint();                           //打印文件
     void filePrintPreview();                    //打印预览
     void filePrintPdf();                        //输出成PDF

@@ -335,9 +335,9 @@ void MainWindow::setupFileActions()
 {
     connect(openAct, &QAction::triggered, this, &MainWindow::openFile);
     connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
-//    connect(saveAct, SIGNAL(triggered()), this, SLOT(fileSave()));
-//    connect(saveAsAct, SIGNAL(triggered()), this, SLOT(fileSaveAs()));
-//    connect(saveAllAct, SIGNAL(triggered()), this, SLOT(fileSaveAll()));
+    connect(saveAct, &QAction::triggered, this, &MainWindow::fileSave);
+    connect(saveAsAct, &QAction::triggered, this, &MainWindow::fileSaveAs);
+    connect(saveAllAct, &QAction::triggered, this, &MainWindow::fileSaveAll);
 //#ifndef QT_NO_PRINTER
 //    connect(printAct, SIGNAL(triggered()), this, SLOT(filePrint()));
 //    connect(printPreviewAct, SIGNAL(triggered()), this,
@@ -415,7 +415,6 @@ void MainWindow::openFile()
     //创建一个新的tab
     Tab_Info_t tabInfo;
     tabInfo.notePadTab = new NotePadTab(tabWidget);
-    connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
     tabInfo.notePadTab->setEditStatus(false);
     tabInfo.notePadTab->setFilePath(filename);
     tabInfo.filePath = filename;
@@ -448,9 +447,12 @@ void MainWindow::openFile()
     file.close();
 
     this->tabWidget->addTab(tabInfo.notePadTab, title);
+    connect(tabInfo.notePadTab->document(), &QTextDocument::contentsChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
+    connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
 
     //聚焦到刚刚打开的文件tab上
     this->tabWidget->setCurrentWidget(tabInfo.notePadTab);
+    tabInfo.notePadTab->setFocus();
 }
 
 /* 新建文件 */
@@ -459,34 +461,170 @@ void MainWindow::newFile()
     //创建一个新的tab
     Tab_Info_t tabInfo;
     tabInfo.notePadTab = new NotePadTab(tabWidget);
-    connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
     tabInfo.notePadTab->setEditStatus(false);
     tabInfo.filePath = "new";
     tabInfo.notePadTab->setFilePath(tabInfo.filePath);
     tabInfoList << tabInfo;
 
     this->tabWidget->addTab(tabInfo.notePadTab, tr("new"));
+    connect(tabInfo.notePadTab->document(), &QTextDocument::contentsChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
+    connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
 
     //聚焦到刚刚新建的文件tab上
     this->tabWidget->setCurrentWidget(tabInfo.notePadTab);
+    tabInfo.notePadTab->setFocus();
 }
 
 /* 保存文件 */
-bool MainWindow::fileSave(int index)
+void MainWindow::fileSave()
 {
+    //根本没有打开的子窗体, 直接返回
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
 
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+    int index = this->tabWidget->indexOf(notePadTabActive);
+
+    //为new, 表示是新建的文件
+    if (notePadTabActive->getFileName() == "new") {
+        QString tmpStr = "保存";
+        tmpStr.append(notePadTabActive->getFileName());
+
+        QString filepath = QFileDialog::getSaveFileName(this, tmpStr, ".", "text(*.cpp *.h *.txt);;all(*.*)");
+        if (filepath.isEmpty() == false) {
+
+            notePadTabActive->setFilePath(filepath);
+
+            //把字窗口中的内容写进文件
+            QFile file(this);
+            file.setFileName(filepath);
+            bool ret = file.open(QIODevice::WriteOnly | QIODevice::Text);
+            if (ret == false) {
+                QMessageBox::warning(this, "错误", "保存出错！");
+                return;
+            }
+            QTextStream stream(&file);
+            //设置流的编码格式
+            //if (encoding == "UTF-8") {
+                stream.setCodec("UTF-8");
+            //} else if (encoding == "GB2312") {
+            //    stream.setCodec("GB18030");
+            //}
+            stream << notePadTabActive->toPlainText();
+            stream.flush();
+            file.close();
+
+            //提示保存成功
+            QMessageBox::information(this, "提示", "保存成功！");
+
+            //设置新的title
+            QFileInfo info(filepath);
+            QString title = info.fileName();
+            this->tabWidget->setTabText(index, title);
+            notePadTabActive->setEditStatus(false);
+        }
+    }
+    //保存之前打开的文件
+    else {
+
+        //从未改变过的文件, 根本不需要保存
+        if (notePadTabActive->getEditStatus() == false) {
+            return;
+        }
+
+        //把字窗口中的内容写进文件
+        QFile file(this);
+        file.setFileName(notePadTabActive->getFilePath());
+        bool ret = file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
+        if (ret == false) {
+            QMessageBox::warning(this, "错误", "保存出错！");
+            return;
+        }
+        QTextStream stream(&file);
+        //设置流的编码格式
+        //if (encoding == "UTF-8") {
+            stream.setCodec("UTF-8");
+        //} else if (encoding == "GB2312") {
+        //    stream.setCodec("GB18030");
+        //}
+        stream << notePadTabActive->toPlainText();
+        stream.flush();
+        file.close();
+
+        QFileInfo info(notePadTabActive->getFilePath());
+        QString title = info.fileName();
+        this->tabWidget->setTabText(index, title);
+        notePadTabActive->setEditStatus(false);
+    }
 }
 
 /* 文件另存为 */
-bool MainWindow::fileSaveAs()
+void MainWindow::fileSaveAs()
 {
+    //根本没有打开的子窗体, 直接返回
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
 
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+
+    QString tmpStr = "另存为";
+    tmpStr = tmpStr.append(notePadTabActive->getFileName());
+    QString filepath = QFileDialog::getSaveFileName(this, tmpStr, ".", "text(*.cpp *.h *.txt);;all(*.*)");
+    if (filepath.isEmpty() == false) {
+
+        //新开一个tab, 显示刚才另存为的文件
+        Tab_Info_t tabInfo;
+        tabInfo.notePadTab = new NotePadTab(tabWidget);
+        tabInfo.notePadTab->setEditStatus(false);
+        tabInfo.filePath = filepath;
+        tabInfo.notePadTab->setFilePath(tabInfo.filePath);
+        tabInfoList << tabInfo;
+
+        tabInfo.notePadTab->setText(notePadTabActive->toPlainText()); //拷贝之前那个tab的文本内容
+        this->tabWidget->addTab(tabInfo.notePadTab, tabInfo.notePadTab->getFileName());
+        connect(tabInfo.notePadTab->document(), &QTextDocument::contentsChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
+        connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
+
+        //聚焦到刚刚新建的文件tab上
+        this->tabWidget->setCurrentWidget(tabInfo.notePadTab);
+        tabInfo.notePadTab->setFocus();
+
+        //保存到磁盘
+        QFile file(this);
+        file.setFileName(filepath);
+        bool ret = file.open(QIODevice::WriteOnly | QIODevice::Text);
+        if (ret == false) {
+            QMessageBox::warning(this, "错误", "保存出错！");
+            return;
+        }
+        QTextStream stream(&file);
+        //设置流的编码格式
+        //if (encoding == "UTF-8") {
+            stream.setCodec("UTF-8");
+        //} else if (encoding == "GB2312") {
+        //    stream.setCodec("GB18030");
+        //}
+        stream << notePadTabActive->toPlainText();
+        stream.flush();
+        file.close();
+
+        //提示另存为成功
+        QMessageBox::information(this, "提示", "另存为成功！");
+    }
 }
 
 /* 保存所有文件 */
-bool MainWindow::fileSaveAll()
+void MainWindow::fileSaveAll()
 {
-
+    //遍历所有tab, 如果某个tab满足保存条件, 就保存它
+    for (int i = 0; i < tabInfoList.size(); i++) {
+        this->tabWidget->setCurrentWidget(tabInfoList[i].notePadTab);
+        fileSave();
+    }
 }
 
 /* 打印文件 */

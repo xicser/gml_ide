@@ -21,12 +21,11 @@ private:
     QString filePath;               //打开的文件路径
     QString fileName;               //打开的文件名称
 
-private slots:
-
-    void slotContentChanged(void);           //文本内容改变时, 调用该槽显示'*'
+public slots:
+    void slotContentChanged(void);                  //文本内容改变时, 调用该槽发送signalContentHasChanged信号
 
 signals:
-    void signalContentHasChanged(NotePadTab *tab); //文本内容改变时, 释放该信号
+    void signalContentHasChanged(NotePadTab *tab);  //文本内容改变时, 释放该信号
 
 };
 
