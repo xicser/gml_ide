@@ -6,6 +6,7 @@
 #include <QPrinter>
 #include <QTabWidget>
 #include <QStatusBar>
+#include <QCloseEvent>
 #include "fullsub/treelayerview.h"
 #include "fullsub/logtextedit.h"
 #include "fullsub/notepadtab.h"
@@ -16,6 +17,9 @@ class MainWindow: public QMainWindow
 public:
     MainWindow(QWidget * = 0);
     ~MainWindow();
+
+protected:
+    void closeEvent(QCloseEvent *);
 
 private:
     QMenuBar *menuBar;                          //菜单栏
@@ -98,11 +102,21 @@ private slots:
     void filePrintPreview();                    //打印预览
     void filePrintPdf();                        //输出成PDF
     void printPreview(QPrinter *);              //打印预览子函数
-    void fileClose(int index);                  //关闭文件（指定文件）
-    void fileClose();                           //关闭文件（当前文件）
-    void fileCloseAll();                        //关闭所有文件
+    void fileClose();                           //关闭文件
+    bool fileCloseAll();                        //关闭所有文件
+    void closeWindow();                         //关闭窗口
+
+    void undo();                                //撤销
+    void redo();                                //重做
+    void cut();                                 //剪切
+    void copy();                                //复制
+    void paste();                               //粘贴
     void jumpLine();                            //转到行
     void search();                              //查找
+
+    void nextTab();                             //上一个tab
+    void prevTab();                             //下一个tab
+
     void about();                               //关于本软件
 
 public slots:

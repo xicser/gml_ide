@@ -44,12 +44,21 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    qDebug() << "~MainWindow";
+}
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    bool isCancel = fileCloseAll();
+    if (isCancel == true) {
+        event->ignore();
+    }
 }
 
 //初始化
 void MainWindow::init()
 {
+    this->setAttribute(Qt::WA_DeleteOnClose);
     tabInfoList.clear();
 
     setWindowIcon(QIcon(":/resource/notepad.png"));
@@ -140,6 +149,7 @@ void MainWindow::setupFileMenu()
     saveAllAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     fileMenu->addAction(saveAllAct);
     topToolBar->addAction(saveAllAct);
+    topToolBar->addSeparator();
 
     fileMenu->addSeparator();
 
@@ -161,6 +171,7 @@ void MainWindow::setupFileMenu()
                                tr("Export Pdf"), this);
     fileMenu->addAction(exportPdfAct);
     topToolBar->addAction(exportPdfAct);
+    topToolBar->addSeparator();
 
     fileMenu->addSeparator();
 
@@ -183,7 +194,6 @@ void MainWindow::setupFileMenu()
     exitAct->setShortcut(QKeySequence::Quit);
     fileMenu->addAction(exitAct);
     topToolBar->addAction(exitAct);
-
     topToolBar->addSeparator();
 
     menuBar->addMenu(fileMenu);
@@ -293,18 +303,18 @@ void MainWindow::setupWindowMenu()
 {
     windowMenu = new QMenu(tr("&Window"), menuBar);
 
-    //下一个窗口
-    nextAct = new QAction(QIcon(tr(":/resource/next.png")), tr("Next Window"), this);
-    nextAct->setShortcut(Qt::CTRL + Qt::Key_Right);
-    windowMenu->addAction(nextAct);
-    topToolBar->addAction(nextAct);
-
     //上一个窗口
     previousAct = new QAction(QIcon(tr(":/resource/previous.png")),
                               tr("Previous Window"), this);
     previousAct->setShortcut(Qt::CTRL + Qt::Key_Left);
     windowMenu->addAction(previousAct);
     topToolBar->addAction(previousAct);
+
+    //下一个窗口
+    nextAct = new QAction(QIcon(tr(":/resource/next.png")), tr("Next Window"), this);
+    nextAct->setShortcut(Qt::CTRL + Qt::Key_Right);
+    windowMenu->addAction(nextAct);
+    topToolBar->addAction(nextAct);
 
     //最近关闭的文件
     recentlyFilesMenu = new QMenu(tr("Recently Files"), windowMenu);
@@ -344,18 +354,19 @@ void MainWindow::setupFileActions()
 //            SLOT(filePrintPreview()));
 //    connect(exportPdfAct, SIGNAL(triggered()), this, SLOT(filePrintPdf()));
 //#endif
-//    connect(closeAct, SIGNAL(triggered()), this, SLOT(fileClose()));
-//    connect(closeAllAct, SIGNAL(triggered()), this, SLOT(fileCloseAll()));
-//    connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
+    connect(closeAct, &QAction::triggered, this, &MainWindow::fileClose);
+    connect(closeAllAct, &QAction::triggered, this, &MainWindow::fileCloseAll);
+    connect(exitAct, &QAction::triggered, this, &MainWindow::closeWindow);
 }
 
 //编辑菜单Action设置
 void MainWindow::setupEditActions()
 {
-//    connect(copyAct, SIGNAL(triggered()), EDITOR,SLOT(copy()));
-//    connect(pasteAct,SIGNAL(triggered()),EDITOR,SLOT(paste()));
-//    connect(undoAct,SIGNAL(triggered()),EDITOR,SLOT(undo()));
-//    connect(redoAct,SIGNAL(triggered()),EDITOR,SLOT(redo()));
+    connect(undoAct, &QAction::triggered, this, &MainWindow::undo);
+    connect(redoAct, &QAction::triggered, this, &MainWindow::redo);
+    connect(cutAct, &QAction::triggered, this, &MainWindow::cut);
+    connect(copyAct, &QAction::triggered, this, &MainWindow::copy);
+    connect(pasteAct, &QAction::triggered, this, &MainWindow::paste);
 //    connect(selectAllAct,SIGNAL(triggered()),EDITOR,SLOT(selectAll()));
 //    connect(upperCaseAct,SIGNAL(triggered()),EDITOR,SLOT(toUpperCase()));
 //    connect(lowerCaseAct,SIGNAL(triggered()),EDITOR,SLOT(toLowerCase()));
@@ -374,8 +385,8 @@ void MainWindow::setupBuildActions()
 //窗口菜单Action设置
 void MainWindow::setupWindowActions()
 {
-//    connect(nextAct, SIGNAL(triggered()), SLOT(nextWindow()));
-//    connect(previousAct, SIGNAL(triggered()), SLOT(previousWindow()));
+    connect(nextAct, &QAction::triggered, this, &MainWindow::nextTab);
+    connect(previousAct, &QAction::triggered, this, &MainWindow::prevTab);
 //    connect(currentAllMenu, SIGNAL(aboutToShow()), SLOT(currentAllWindow()));
 //    connect(recentlyFilesMenu, SIGNAL(aboutToShow()), SLOT(updateRecentFiles()));
 }
@@ -651,22 +662,206 @@ void MainWindow::printPreview(QPrinter *)
 
 }
 
-/* 关闭文件（指定文件） */
-void MainWindow::fileClose(int index)
-{
-
-}
-
-/* 关闭文件（当前文件） */
+/* 关闭文件 */
 void MainWindow::fileClose()
 {
+    //根本没有打开的子窗体, 直接返回
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
 
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+    int index = this->tabWidget->indexOf(notePadTabActive);
+
+    //如果该窗体正在被编辑, 则要提示是否保存
+    if (notePadTabActive->getEditStatus() == true || notePadTabActive->getFileName() == "new") {
+        QString tmpStr = "是否保存 ";
+        tmpStr.append(notePadTabActive->getFileName());
+        tmpStr.append(" ?");
+        QMessageBox::StandardButton ret = QMessageBox::information(this, "保存提示", tmpStr,
+                                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        switch (ret) {
+            case QMessageBox::Yes: {
+
+                //保存文件
+                this->fileSave();
+
+                //保存完成后, 关闭该窗体
+                this->tabWidget->removeTab(index);
+                //从list里面去除
+                for (int i = 0; i < tabInfoList.size(); i++) {
+                    if (notePadTabActive == tabInfoList[i].notePadTab) {
+                        tabInfoList.removeAt(i);
+                    }
+                }
+                delete notePadTabActive;
+
+                break;
+            }
+            case QMessageBox::No: {
+                this->tabWidget->removeTab(index);
+                //从list里面去除
+                for (int i = 0; i < tabInfoList.size(); i++) {
+                    if (notePadTabActive == tabInfoList[i].notePadTab) {
+                        tabInfoList.removeAt(i);
+                    }
+                }
+                delete notePadTabActive;
+                break;
+            }
+            case QMessageBox::Cancel: break;
+            default: break;
+        }
+    }
+    //否则直接关闭即可
+    else {
+        this->tabWidget->removeTab(index);
+        //从list里面去除
+        for (int i = 0; i < tabInfoList.size(); i++) {
+            if (notePadTabActive == tabInfoList[i].notePadTab) {
+                tabInfoList.removeAt(i);
+            }
+        }
+        delete notePadTabActive;
+    }
 }
 
 /* 关闭所有文件 */
-void MainWindow::fileCloseAll()
+bool MainWindow::fileCloseAll()
 {
+    //遍历所有tab, 如果某个tab满足保存条件, 就关闭它
+    while (tabInfoList.size() > 0) {
 
+        //先获取当前活动的子窗体
+        NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+        int index = this->tabWidget->indexOf(notePadTabActive);
+
+        //如果该窗体正在被编辑, 则要提示是否保存
+        if (notePadTabActive->getEditStatus() == true || notePadTabActive->getFileName() == "new") {
+            QString tmpStr = "是否保存 ";
+            tmpStr.append(notePadTabActive->getFileName());
+            tmpStr.append(" ?");
+            QMessageBox::StandardButton ret = QMessageBox::information(this, "保存提示", tmpStr,
+                                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+            switch (ret) {
+                case QMessageBox::Yes: {
+
+                    //保存文件
+                    this->fileSave();
+
+                    //保存完成后, 关闭该窗体
+                    this->tabWidget->removeTab(index);
+                    //从list里面去除
+                    for (int i = 0; i < tabInfoList.size(); i++) {
+                        if (notePadTabActive == tabInfoList[i].notePadTab) {
+                            tabInfoList.removeAt(i);
+                        }
+                    }
+                    delete notePadTabActive;
+
+                    break;
+                }
+                case QMessageBox::No: {
+                    this->tabWidget->removeTab(index);
+                    //从list里面去除
+                    for (int i = 0; i < tabInfoList.size(); i++) {
+                        if (notePadTabActive == tabInfoList[i].notePadTab) {
+                            tabInfoList.removeAt(i);
+                        }
+                    }
+                    delete notePadTabActive;
+                    break;
+                }
+                case QMessageBox::Cancel: return true;
+                default: break;
+            }
+        }
+        //否则直接关闭即可
+        else {
+            this->tabWidget->removeTab(index);
+            //从list里面去除
+            for (int i = 0; i < tabInfoList.size(); i++) {
+                if (notePadTabActive == tabInfoList[i].notePadTab) {
+                    tabInfoList.removeAt(i);
+                }
+            }
+            delete notePadTabActive;
+        }
+    }
+
+    return false;
+}
+
+/* 关闭窗口 */
+void MainWindow::closeWindow()
+{
+    this->close();
+}
+
+/* 撤销 */
+void MainWindow::undo(void)
+{
+    //根本没有打开的子窗体, 直接返回
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
+
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+    notePadTabActive->undo();
+}
+
+/* 重做 */
+void MainWindow::redo(void)
+{
+    //根本没有打开的子窗体, 直接返回
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
+
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+    notePadTabActive->redo();
+}
+
+/* 剪切 */
+void MainWindow::cut(void)
+{
+    //根本没有打开的子窗体, 直接返回
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
+
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+    notePadTabActive->cut();
+}
+
+/* 复制 */
+void MainWindow::copy(void)
+{
+    //根本没有打开的子窗体, 直接返回
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
+
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+    notePadTabActive->copy();
+}
+
+/* 粘贴 */
+void MainWindow::paste(void)
+{
+    //根本没有打开的子窗体, 直接返回
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
+
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+    notePadTabActive->paste();
 }
 
 /* 转到行 */
@@ -679,6 +874,36 @@ void MainWindow::jumpLine()
 void MainWindow::search()
 {
 
+}
+
+/* 上一个tab */
+void MainWindow::nextTab()
+{
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+
+    for (int i = 0; i < tabInfoList.size(); i++) {
+        if (notePadTabActive == tabInfoList[i].notePadTab) {
+            if (i < tabInfoList.size() - 1) {
+                this->tabWidget->setCurrentWidget(tabInfoList[i + 1].notePadTab);
+            }
+        }
+    }
+}
+
+/* 下一个tab */
+void MainWindow::prevTab()
+{
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+
+    for (int i = 0; i < tabInfoList.size(); i++) {
+        if (notePadTabActive == tabInfoList[i].notePadTab) {
+            if (i > 0) {
+                this->tabWidget->setCurrentWidget(tabInfoList[i - 1].notePadTab);
+            }
+        }
+    }
 }
 
 //关于本软件
