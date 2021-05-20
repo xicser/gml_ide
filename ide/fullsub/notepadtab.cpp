@@ -1,15 +1,27 @@
 #include "notepadtab.h"
 #include <QDebug>
 #include <QFileInfo>
-#include <Qsci/qsciscintilla.h>
-#include <Qsci/qscilexerpython.h>
-#include <Qsci/qsciapis.h>
+#include <QVBoxLayout>
 
-NotePadTab::NotePadTab(QWidget *parent) : QTextEdit(parent)
+NotePadTab::NotePadTab(QWidget *parent) : QsciScintilla(parent)
 {
+    //设置语法
+    QsciLexerPython *textLexer = new QsciLexerPython;       //创建一个词法分析器
+    this->setLexer(textLexer);                            //给QsciScintilla设置词法分析器
 
-   // QsciScintilla;
+    //行号提示
+    this->setMarginType(0,QsciScintilla::NumberMargin);   //设置编号为0的页边显示行号。
+    this->setMarginLineNumbers(0, true);                  //对该页边启用行号
+    this->setMarginWidth(0, 15);                          //设置页边宽度
 
+    //代码提示
+    QsciAPIs *apis = new QsciAPIs(textLexer);
+    apis->add(QString("import"));
+    apis->prepare();
+
+    this->setAutoCompletionSource(QsciScintilla::AcsAll);   //设置源, 自动补全所有地方出现的
+    this->setAutoCompletionCaseSensitivity(true);           //设置自动补全大小写敏感
+    this->setAutoCompletionThreshold(3);                    //设置每输入3个字符就会出现自动补全的提示
 }
 
 QSize NotePadTab::sizeHint() const

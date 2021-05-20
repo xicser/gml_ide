@@ -25,6 +25,7 @@
 #include <QApplication>
 #include <QDockWidget>
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
@@ -458,7 +459,7 @@ void MainWindow::openFile()
     file.close();
 
     this->tabWidget->addTab(tabInfo.notePadTab, title);
-    connect(tabInfo.notePadTab->document(), &QTextDocument::contentsChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
+    connect(tabInfo.notePadTab, &QsciScintilla::textChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
     connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
 
     //聚焦到刚刚打开的文件tab上
@@ -478,7 +479,7 @@ void MainWindow::newFile()
     tabInfoList << tabInfo;
 
     this->tabWidget->addTab(tabInfo.notePadTab, tr("new"));
-    connect(tabInfo.notePadTab->document(), &QTextDocument::contentsChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
+    connect(tabInfo.notePadTab, &QsciScintilla::textChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
     connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
 
     //聚焦到刚刚新建的文件tab上
@@ -523,7 +524,7 @@ void MainWindow::fileSave()
             //} else if (encoding == "GB2312") {
             //    stream.setCodec("GB18030");
             //}
-            stream << notePadTabActive->toPlainText();
+            stream << notePadTabActive->text();
             stream.flush();
             file.close();
 
@@ -560,7 +561,7 @@ void MainWindow::fileSave()
         //} else if (encoding == "GB2312") {
         //    stream.setCodec("GB18030");
         //}
-        stream << notePadTabActive->toPlainText();
+        stream << notePadTabActive->text();
         stream.flush();
         file.close();
 
@@ -595,9 +596,9 @@ void MainWindow::fileSaveAs()
         tabInfo.notePadTab->setFilePath(tabInfo.filePath);
         tabInfoList << tabInfo;
 
-        tabInfo.notePadTab->setText(notePadTabActive->toPlainText()); //拷贝之前那个tab的文本内容
+        tabInfo.notePadTab->setText(notePadTabActive->text()); //拷贝之前那个tab的文本内容
         this->tabWidget->addTab(tabInfo.notePadTab, tabInfo.notePadTab->getFileName());
-        connect(tabInfo.notePadTab->document(), &QTextDocument::contentsChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
+        connect(tabInfo.notePadTab, &QsciScintilla::textChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
         connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
 
         //聚焦到刚刚新建的文件tab上
@@ -619,7 +620,7 @@ void MainWindow::fileSaveAs()
         //} else if (encoding == "GB2312") {
         //    stream.setCodec("GB18030");
         //}
-        stream << notePadTabActive->toPlainText();
+        stream << notePadTabActive->text();
         stream.flush();
         file.close();
 

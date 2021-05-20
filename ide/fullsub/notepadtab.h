@@ -2,8 +2,11 @@
 #define NOTEPADTAB_H
 
 #include <QTextEdit>
+#include <Qsci/qsciscintilla.h>
+#include <Qsci/qscilexerpython.h>
+#include <Qsci/qsciapis.h>
 
-class NotePadTab : public QTextEdit
+class NotePadTab : public QsciScintilla
 {
     Q_OBJECT
 public:
