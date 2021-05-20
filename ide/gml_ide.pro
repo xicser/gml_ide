@@ -5,6 +5,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = gml_ide
 TEMPLATE = app
 
+DEFINES += QSCINTILLA_DLL
+
 HEADERS += \
     fullscreen/mainwindow.h \
     fullsub/treelayerview.h \
