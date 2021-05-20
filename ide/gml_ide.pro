@@ -18,8 +18,8 @@ SOURCES += \
     fullsub/logtextedit.cpp \
     fullsub/notepadtab.cpp
 
-INCLUDEPATH += ./qscitinlla
-LIBS += -L./qscitinlla -lqscintilla2_qt5d
+INCLUDEPATH += qscitinlla
+LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5d
 
 FORMS +=
 
