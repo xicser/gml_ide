@@ -404,8 +404,8 @@ void MainWindow::setupEditActions()
     connect(copyAct, &QAction::triggered, this, &MainWindow::slotCopy);
     connect(pasteAct, &QAction::triggered, this, &MainWindow::slotPaste);
     connect(selectAllAct, &QAction::triggered, this, &MainWindow::slotSelectAll);
-//    connect(upperCaseAct,SIGNAL(triggered()),EDITOR,SLOT(toUpperCase()));
-//    connect(lowerCaseAct,SIGNAL(triggered()),EDITOR,SLOT(toLowerCase()));
+    connect(upperCaseAct, &QAction::triggered, this, &MainWindow::slotToUpperCase);
+    connect(lowerCaseAct, &QAction::triggered, this, &MainWindow::slotToLowerCase);
 //    connect(gotoLineAct,SIGNAL(triggered()),this,SLOT(gotoLine()));
 //    connect(findAct,SIGNAL(triggered()),this,SLOT(search()));
 }
@@ -927,6 +927,34 @@ void MainWindow::slotSelectAll()
     //先获取当前活动的子窗体
     NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
     notePadTabActive->selectAll();
+}
+
+/* 转为大写 */
+void MainWindow::slotToUpperCase()
+{
+    //根本没有打开的子窗体, 直接返回
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
+
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+    QString selectedStr = notePadTabActive->selectedText().toUpper();
+    notePadTabActive->replaceSelectedText(selectedStr);
+}
+
+/* 转为小写 */
+void MainWindow::slotToLowerCase()
+{
+    //根本没有打开的子窗体, 直接返回
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
+
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+    QString selectedStr = notePadTabActive->selectedText().toLower();
+    notePadTabActive->replaceSelectedText(selectedStr);
 }
 
 /* 转到行 */

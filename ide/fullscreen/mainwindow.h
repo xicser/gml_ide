@@ -123,6 +123,8 @@ private slots:
     void slotCopy();                            //复制
     void slotPaste();                           //粘贴
     void slotSelectAll();                       //全选
+    void slotToUpperCase();                     //转为大写
+    void slotToLowerCase();                     //转为小写
     void slotJumpLine();                        //转到行
     void slotSearch();                          //查找
 
