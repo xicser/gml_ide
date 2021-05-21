@@ -11,6 +11,8 @@ class NotePadTab : public QsciScintilla
     Q_OBJECT
 public:
     NotePadTab(QWidget *parent);
+    ~NotePadTab();
+
     QSize sizeHint() const;
 
     void setEditStatus(bool status);            //设置编辑状态
@@ -23,6 +25,10 @@ private:
     bool isEditing;                 //表征当前文本是否处于编辑状态
     QString filePath;               //打开的文件路径
     QString fileName;               //打开的文件名称
+
+    QsciLexerPython *textLexer;     //词法分析器
+    QsciAPIs *apis;                 //代码提示
+
 
 public slots:
     void slotContentChanged(void);                  //文本内容改变时, 调用该槽发送signalContentHasChanged信号

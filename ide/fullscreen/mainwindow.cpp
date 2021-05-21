@@ -50,7 +50,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    bool isCancel = fileCloseAll();
+    bool isCancel = slotFileCloseAll();
     if (isCancel == true) {
         event->ignore();
     }
@@ -99,6 +99,7 @@ void MainWindow::init()
     tabWidget->setMovable(true);
     tabWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     tabWidget->setTabsClosable(true);
+    connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::slotTabRequestClose);
     this->setCentralWidget(tabWidget);
 
     //全屏显示
@@ -344,30 +345,30 @@ void MainWindow::setupHelpMenu()
 //文件菜单Action设置
 void MainWindow::setupFileActions()
 {
-    connect(openAct, &QAction::triggered, this, &MainWindow::openFile);
-    connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
-    connect(saveAct, &QAction::triggered, this, &MainWindow::fileSave);
-    connect(saveAsAct, &QAction::triggered, this, &MainWindow::fileSaveAs);
-    connect(saveAllAct, &QAction::triggered, this, &MainWindow::fileSaveAll);
+    connect(openAct, &QAction::triggered, this, &MainWindow::slotFileOpen);
+    connect(newAct, &QAction::triggered, this, &MainWindow::slotFileNew);
+    connect(saveAct, &QAction::triggered, this, &MainWindow::slotFileSave);
+    connect(saveAsAct, &QAction::triggered, this, &MainWindow::slotFileSaveAs);
+    connect(saveAllAct, &QAction::triggered, this, &MainWindow::slotFileSaveAll);
 //#ifndef QT_NO_PRINTER
 //    connect(printAct, SIGNAL(triggered()), this, SLOT(filePrint()));
 //    connect(printPreviewAct, SIGNAL(triggered()), this,
 //            SLOT(filePrintPreview()));
 //    connect(exportPdfAct, SIGNAL(triggered()), this, SLOT(filePrintPdf()));
 //#endif
-    connect(closeAct, &QAction::triggered, this, &MainWindow::fileClose);
-    connect(closeAllAct, &QAction::triggered, this, &MainWindow::fileCloseAll);
-    connect(exitAct, &QAction::triggered, this, &MainWindow::closeWindow);
+    connect(closeAct, &QAction::triggered, this, &MainWindow::slotFileClose);
+    connect(closeAllAct, &QAction::triggered, this, &MainWindow::slotFileCloseAll);
+    connect(exitAct, &QAction::triggered, this, &MainWindow::slotCloseWindow);
 }
 
 //编辑菜单Action设置
 void MainWindow::setupEditActions()
 {
-    connect(undoAct, &QAction::triggered, this, &MainWindow::undo);
-    connect(redoAct, &QAction::triggered, this, &MainWindow::redo);
-    connect(cutAct, &QAction::triggered, this, &MainWindow::cut);
-    connect(copyAct, &QAction::triggered, this, &MainWindow::copy);
-    connect(pasteAct, &QAction::triggered, this, &MainWindow::paste);
+    connect(undoAct, &QAction::triggered, this, &MainWindow::slotUndo);
+    connect(redoAct, &QAction::triggered, this, &MainWindow::slotRedo);
+    connect(cutAct, &QAction::triggered, this, &MainWindow::slotCut);
+    connect(copyAct, &QAction::triggered, this, &MainWindow::slotCopy);
+    connect(pasteAct, &QAction::triggered, this, &MainWindow::slotPaste);
 //    connect(selectAllAct,SIGNAL(triggered()),EDITOR,SLOT(selectAll()));
 //    connect(upperCaseAct,SIGNAL(triggered()),EDITOR,SLOT(toUpperCase()));
 //    connect(lowerCaseAct,SIGNAL(triggered()),EDITOR,SLOT(toLowerCase()));
@@ -386,8 +387,8 @@ void MainWindow::setupBuildActions()
 //窗口菜单Action设置
 void MainWindow::setupWindowActions()
 {
-    connect(nextAct, &QAction::triggered, this, &MainWindow::nextTab);
-    connect(previousAct, &QAction::triggered, this, &MainWindow::prevTab);
+    connect(nextAct, &QAction::triggered, this, &MainWindow::slotNextTab);
+    connect(previousAct, &QAction::triggered, this, &MainWindow::slotPrevTab);
 //    connect(currentAllMenu, SIGNAL(aboutToShow()), SLOT(currentAllWindow()));
 //    connect(recentlyFilesMenu, SIGNAL(aboutToShow()), SLOT(updateRecentFiles()));
 }
@@ -395,11 +396,11 @@ void MainWindow::setupWindowActions()
 //帮助Action设置
 void MainWindow::setupHelpActions()
 {
-    connect(aboutAct, &QAction::triggered, this, &MainWindow::about);
+    connect(aboutAct, &QAction::triggered, this, &MainWindow::slotAbout);
 }
 
 /* 打开文件 */
-void MainWindow::openFile()
+void MainWindow::slotFileOpen()
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("选择文本文件"), ".",
              "text(*.cpp *.h *.txt);;all(*.*)");
@@ -468,7 +469,7 @@ void MainWindow::openFile()
 }
 
 /* 新建文件 */
-void MainWindow::newFile()
+void MainWindow::slotFileNew()
 {
     //创建一个新的tab
     Tab_Info_t tabInfo;
@@ -488,7 +489,7 @@ void MainWindow::newFile()
 }
 
 /* 保存文件 */
-void MainWindow::fileSave()
+void MainWindow::slotFileSave()
 {
     //根本没有打开的子窗体, 直接返回
     if (tabInfoList.isEmpty() == true) {
@@ -573,7 +574,7 @@ void MainWindow::fileSave()
 }
 
 /* 文件另存为 */
-void MainWindow::fileSaveAs()
+void MainWindow::slotFileSaveAs()
 {
     //根本没有打开的子窗体, 直接返回
     if (tabInfoList.isEmpty() == true) {
@@ -630,41 +631,41 @@ void MainWindow::fileSaveAs()
 }
 
 /* 保存所有文件 */
-void MainWindow::fileSaveAll()
+void MainWindow::slotFileSaveAll()
 {
     //遍历所有tab, 如果某个tab满足保存条件, 就保存它
     for (int i = 0; i < tabInfoList.size(); i++) {
         this->tabWidget->setCurrentWidget(tabInfoList[i].notePadTab);
-        fileSave();
+        slotFileSave();
     }
 }
 
 /* 打印文件 */
-void MainWindow::filePrint()
+void MainWindow::slotFilePrint()
 {
 
 }
 
 /* 打印预览 */
-void MainWindow::filePrintPreview()
+void MainWindow::slotFilePrintPreview()
 {
 
 }
 
 /* 输出成PDF */
-void MainWindow::filePrintPdf()
+void MainWindow::slotFilePrintPdf()
 {
 
 }
 
 /* 打印预览子函数 */
-void MainWindow::printPreview(QPrinter *)
+void MainWindow::slotPrintPreview(QPrinter *)
 {
 
 }
 
 /* 关闭文件 */
-void MainWindow::fileClose()
+void MainWindow::slotFileClose()
 {
     //根本没有打开的子窗体, 直接返回
     if (tabInfoList.isEmpty() == true) {
@@ -686,7 +687,7 @@ void MainWindow::fileClose()
             case QMessageBox::Yes: {
 
                 //保存文件
-                this->fileSave();
+                this->slotFileSave();
 
                 //保存完成后, 关闭该窗体
                 this->tabWidget->removeTab(index);
@@ -729,7 +730,7 @@ void MainWindow::fileClose()
 }
 
 /* 关闭所有文件 */
-bool MainWindow::fileCloseAll()
+bool MainWindow::slotFileCloseAll()
 {
     //遍历所有tab, 如果某个tab满足保存条件, 就关闭它
     while (tabInfoList.size() > 0) {
@@ -749,7 +750,7 @@ bool MainWindow::fileCloseAll()
                 case QMessageBox::Yes: {
 
                     //保存文件
-                    this->fileSave();
+                    this->slotFileSave();
 
                     //保存完成后, 关闭该窗体
                     this->tabWidget->removeTab(index);
@@ -795,13 +796,13 @@ bool MainWindow::fileCloseAll()
 }
 
 /* 关闭窗口 */
-void MainWindow::closeWindow()
+void MainWindow::slotCloseWindow()
 {
     this->close();
 }
 
 /* 撤销 */
-void MainWindow::undo(void)
+void MainWindow::slotUndo(void)
 {
     //根本没有打开的子窗体, 直接返回
     if (tabInfoList.isEmpty() == true) {
@@ -814,7 +815,7 @@ void MainWindow::undo(void)
 }
 
 /* 重做 */
-void MainWindow::redo(void)
+void MainWindow::slotRedo(void)
 {
     //根本没有打开的子窗体, 直接返回
     if (tabInfoList.isEmpty() == true) {
@@ -827,7 +828,7 @@ void MainWindow::redo(void)
 }
 
 /* 剪切 */
-void MainWindow::cut(void)
+void MainWindow::slotCut(void)
 {
     //根本没有打开的子窗体, 直接返回
     if (tabInfoList.isEmpty() == true) {
@@ -840,7 +841,7 @@ void MainWindow::cut(void)
 }
 
 /* 复制 */
-void MainWindow::copy(void)
+void MainWindow::slotCopy(void)
 {
     //根本没有打开的子窗体, 直接返回
     if (tabInfoList.isEmpty() == true) {
@@ -853,7 +854,7 @@ void MainWindow::copy(void)
 }
 
 /* 粘贴 */
-void MainWindow::paste(void)
+void MainWindow::slotPaste(void)
 {
     //根本没有打开的子窗体, 直接返回
     if (tabInfoList.isEmpty() == true) {
@@ -866,19 +867,19 @@ void MainWindow::paste(void)
 }
 
 /* 转到行 */
-void MainWindow::jumpLine()
+void MainWindow::slotJumpLine()
 {
 
 }
 
 /* 查找 */
-void MainWindow::search()
+void MainWindow::slotSearch()
 {
 
 }
 
 /* 上一个tab */
-void MainWindow::nextTab()
+void MainWindow::slotNextTab()
 {
     //先获取当前活动的子窗体
     NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
@@ -893,7 +894,7 @@ void MainWindow::nextTab()
 }
 
 /* 下一个tab */
-void MainWindow::prevTab()
+void MainWindow::slotPrevTab()
 {
     //先获取当前活动的子窗体
     NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
@@ -908,11 +909,18 @@ void MainWindow::prevTab()
 }
 
 //关于本软件
-void MainWindow::about()
+void MainWindow::slotAbout()
 {
     QMessageBox::about(this, tr("About"), tr("This example demonstrates Qt's "
                                              "rich text editing facilities in action, providing an example "
                                              "document for you to experiment with."));
+}
+
+/* tab请求关闭 */
+void MainWindow::slotTabRequestClose(int index)
+{
+    this->tabWidget->setCurrentIndex(index);
+    this->slotFileClose();
 }
 
 /* 接收某个notePadTab内容改变的槽 */

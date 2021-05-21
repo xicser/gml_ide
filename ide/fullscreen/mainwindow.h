@@ -93,31 +93,33 @@ private:
     QList<Tab_Info_t> tabInfoList;              //打开的tab信息list
 
 private slots:
-    void openFile();                            //打开文件
-    void newFile();                             //新建文件
-    void fileSave();                            //保存文件
-    void fileSaveAs();                          //文件另存为
-    void fileSaveAll();                         //保存所有文件
-    void filePrint();                           //打印文件
-    void filePrintPreview();                    //打印预览
-    void filePrintPdf();                        //输出成PDF
-    void printPreview(QPrinter *);              //打印预览子函数
-    void fileClose();                           //关闭文件
-    bool fileCloseAll();                        //关闭所有文件
-    void closeWindow();                         //关闭窗口
+    void slotFileOpen();                        //打开文件
+    void slotFileNew();                         //新建文件
+    void slotFileSave();                        //保存文件
+    void slotFileSaveAs();                      //文件另存为
+    void slotFileSaveAll();                     //保存所有文件
+    void slotFilePrint();                       //打印文件
+    void slotFilePrintPreview();                //打印预览
+    void slotFilePrintPdf();                    //输出成PDF
+    void slotPrintPreview(QPrinter *);          //打印预览子函数
+    void slotFileClose();                       //关闭文件
+    bool slotFileCloseAll();                    //关闭所有文件
+    void slotCloseWindow();                     //关闭窗口
 
-    void undo();                                //撤销
-    void redo();                                //重做
-    void cut();                                 //剪切
-    void copy();                                //复制
-    void paste();                               //粘贴
-    void jumpLine();                            //转到行
-    void search();                              //查找
+    void slotUndo();                            //撤销
+    void slotRedo();                            //重做
+    void slotCut();                             //剪切
+    void slotCopy();                            //复制
+    void slotPaste();                           //粘贴
+    void slotJumpLine();                        //转到行
+    void slotSearch();                          //查找
 
-    void nextTab();                             //上一个tab
-    void prevTab();                             //下一个tab
+    void slotNextTab();                         //上一个tab
+    void slotPrevTab();                         //下一个tab
 
-    void about();                               //关于本软件
+    void slotAbout();                           //关于本软件
+
+    void slotTabRequestClose(int);              //tab请求关闭
 
 public slots:
     void slotNotePadContentChanged(NotePadTab *notePadTab);     //接收某个notePadTab内容改变的槽
