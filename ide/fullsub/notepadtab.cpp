@@ -5,35 +5,60 @@
 
 NotePadTab::NotePadTab(QWidget *parent) : QsciScintilla(parent)
 {
-    //设置语法
-    textLexer = new QsciLexerPython;     //创建一个词法分析器
-    this->setLexer(textLexer);                            //给QsciScintilla设置词法分析器
+    editorInit();
 
-    //行号提示
-    this->setMarginType(0,QsciScintilla::NumberMargin);   //设置编号为0的页边显示行号。
-    this->setMarginLineNumbers(0, true);                  //对该页边启用行号
-    this->setMarginWidth(0, 15);                          //设置页边宽度
-
-    //代码提示
-    apis = new QsciAPIs(textLexer);
-    apis->add(QString("import"));
-    apis->prepare();
-
-    this->setAutoCompletionSource(QsciScintilla::AcsAll);   //设置源, 自动补全所有地方出现的
-    this->setAutoCompletionCaseSensitivity(true);           //设置自动补全大小写敏感
-    this->setAutoCompletionThreshold(3);                    //设置每输入3个字符就会出现自动补全的提示
 }
 
 NotePadTab::~NotePadTab()
 {
     delete apis;
-    delete textLexer;
 }
 
 QSize NotePadTab::sizeHint() const
 {
     return QSize(200, 200); /* 在这里定义dock的初始大小 */
 }
+
+/* 编辑器初始化 */
+void NotePadTab::editorInit(void)
+{
+    //设置显示字体
+    QFont font("Courier New", 12, QFont::Normal);
+    this->setMarginsFont(font);
+
+    //设置左侧行号栏宽度等
+    QFontMetrics fontMetrics = QFontMetrics(font);
+    this->setMarginWidth(0, fontMetrics.width("00000"));
+    this->setMarginLineNumbers(0, true);
+    this->setBraceMatching(QsciScintilla::SloppyBraceMatch);
+
+    //设置tab的宽度
+    this->setTabWidth(4);
+
+    //设置括号等自动补全
+    this->setAutoIndent(true);
+
+    //光标所在行背景色
+    this->setCaretLineVisible(true);
+    this->setCaretLineBackgroundColor(QColor(217, 235, 249));
+
+    //设置默认换行符
+    //this->setEolMode(QsciScintilla::EolUnix);
+
+    //代码提示
+    //设置C++解析器
+    textLexer = new QsciLexerCPP(this);
+    textLexer->setFont(font);
+    this->setLexer(textLexer);
+    apis = new QsciAPIs(textLexer);
+    apis->add(QString("import")); //添加可提示的单词
+    apis->prepare();
+    this->setAutoCompletionSource(QsciScintilla::AcsAll);   //设置源, 自动补全所有地方出现的
+    this->setAutoCompletionCaseSensitivity(true);           //设置自动补全大小写敏感
+    this->setAutoCompletionThreshold(1);                    //设置每输入1个字符就会出现自动补全的提示
+
+}
+
 
 /* 设置编辑状态 */
 void NotePadTab::setEditStatus(bool status)
@@ -67,6 +92,29 @@ QString NotePadTab::getFilePath(void)
 QString NotePadTab::getFileName(void)
 {
     return this->fileName;
+}
+
+/* 设置编码格式 */
+void NotePadTab::setEncoding(QString encoding)
+{
+    this->enCoding = encoding;
+    //设置编码方式
+    if (this->enCoding == "utf-8") {
+        this->SendScintilla(QsciScintilla::SCI_SETCODEPAGE, QsciScintilla::SC_CP_UTF8);
+    } else {
+
+        this->SendScintilla(QsciScintilla::SCI_SETCODEPAGE, 936);
+        this->SendScintilla(QsciScintilla::SCI_STYLESETCHARACTERSET,  QsciScintilla::SC_CHARSET_GB2312);
+
+//        qDebug() << this->SendScintilla(QsciScintilla::SCI_GETCODEPAGE);
+//        qDebug() << this->SendScintilla(QsciScintilla::SCI_STYLEGETCHARACTERSET);
+    }
+}
+
+/* 获取编码格式 */
+QString NotePadTab::getEncoding(void)
+{
+    return this->enCoding;
 }
 
 /* 文本内容改变时, 调用该槽发送signalContentHasChanged信号 */

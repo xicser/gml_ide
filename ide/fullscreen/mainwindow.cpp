@@ -7,10 +7,8 @@
 #include <QPrinter>
 #include <QPrintPreviewDialog>
 #include <QTabWidget>
-#include <QTextDocumentWriter>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <QKeySequence>
 #include <QMenuBar>
 #include <QToolBar>
 #include <QFont>
@@ -32,12 +30,14 @@ MainWindow::MainWindow(QWidget *parent) :
     init();
     setupFileMenu();
     setupEditMenu();
+    setupFormatMenu();
     setupBuildMenu();
     setupWindowMenu();
     setupHelpMenu();
 
     setupFileActions();
     setupEditActions();
+    setupFormatActions();
     setupBuildActions();
     setupWindowActions();
     setupHelpActions();
@@ -61,6 +61,7 @@ void MainWindow::init()
 {
     this->setAttribute(Qt::WA_DeleteOnClose);
     tabInfoList.clear();
+    enCoding = "utf-8";
 
     setWindowIcon(QIcon(":/resource/notepad.png"));
     setWindowTitle("GML Integrated Development Environment");
@@ -278,6 +279,36 @@ void MainWindow::setupEditMenu()
     menuBar->addMenu(editMenu);
 }
 
+/* 格式菜单功能实现 */
+void MainWindow::setupFormatMenu()
+{
+    formatMenu = new QMenu(tr("&Format"), menuBar);
+    enCodingMenu = new QMenu(tr("Encoding"), formatMenu);
+
+    //字体
+    fontAct = new QAction(QIcon(tr(":/resource/textfont.png")), tr("Font"), formatMenu);
+    topToolBar->addAction(fontAct);
+    topToolBar->addSeparator();
+
+    //UTF-8
+    enCodingUTF8Act = new QAction(tr("UTF-8"), enCodingMenu);
+    enCodingUTF8Act->setCheckable(true);
+    enCodingUTF8Act->setChecked(true);
+
+    //GB2312
+    enCodingGB2312Act = new QAction(tr("GB2312"), enCodingMenu);
+    enCodingGB2312Act->setCheckable(true);
+    enCodingGB2312Act->setChecked(false);
+
+    formatMenu->addMenu(enCodingMenu);
+    enCodingMenu->addAction(enCodingUTF8Act);
+    enCodingMenu->addAction(enCodingGB2312Act);
+    formatMenu->addSeparator();
+    formatMenu->addAction(fontAct);
+
+    menuBar->addMenu(formatMenu);
+}
+
 /* 构建菜单功能实现 */
 void MainWindow::setupBuildMenu()
 {
@@ -376,6 +407,14 @@ void MainWindow::setupEditActions()
 //    connect(findAct,SIGNAL(triggered()),this,SLOT(search()));
 }
 
+/* 格式菜单Action设置 */
+void MainWindow::setupFormatActions()
+{
+    connect(fontAct, &QAction::triggered, this, &MainWindow::slotFontSelection);
+    connect(enCodingUTF8Act, &QAction::triggered, this, &MainWindow::slotEncodingUTF8);
+    connect(enCodingGB2312Act, &QAction::triggered, this, &MainWindow::slotEncodingGB2312);
+}
+
 /* 构建菜单Action设置 */
 void MainWindow::setupBuildActions()
 {
@@ -428,6 +467,7 @@ void MainWindow::slotFileOpen()
     //创建一个新的tab
     Tab_Info_t tabInfo;
     tabInfo.notePadTab = new NotePadTab(tabWidget);
+    tabInfo.notePadTab->setEncoding(this->enCoding);
     tabInfo.notePadTab->setEditStatus(false);
     tabInfo.notePadTab->setFilePath(filename);
     tabInfo.filePath = filename;
@@ -440,23 +480,18 @@ void MainWindow::slotFileOpen()
     //打开文件(用流的方式)
     QFile file(this);
     file.setFileName(filename);
-    bool ret = file.open(QIODevice::ReadOnly);
+    bool ret = file.open(QIODevice::ReadOnly | QIODevice::Text);
     if (ret == false) {
         QMessageBox::warning(this, "错误", "打开出错！");
         return;
     }
-    QTextStream stream(&file);
-
-    //设置流的编码格式
-    //if (encoding == "UTF-8") {
-        stream.setCodec("UTF-8");
-    //} else if (encoding == "GB2312") {
-    //    stream.setCodec("GB18030");
-    //}
-    while (!stream.atEnd()) {
-        QString str = stream.readLine();
-        tabInfo.notePadTab->append(str);
+    QTextStream inStream(&file);
+    if (this->enCoding == "utf-8") {
+        inStream.setCodec("UTF-8");
+    } else {
+        inStream.setCodec("GB18030");
     }
+    tabInfo.notePadTab->setText(inStream.readAll());
     file.close();
 
     this->tabWidget->addTab(tabInfo.notePadTab, title);
@@ -474,12 +509,13 @@ void MainWindow::slotFileNew()
     //创建一个新的tab
     Tab_Info_t tabInfo;
     tabInfo.notePadTab = new NotePadTab(tabWidget);
-    tabInfo.notePadTab->setEditStatus(false);
+    tabInfo.notePadTab->setEncoding(this->enCoding);
+    tabInfo.notePadTab->setEditStatus(true);
     tabInfo.filePath = "new";
     tabInfo.notePadTab->setFilePath(tabInfo.filePath);
     tabInfoList << tabInfo;
 
-    this->tabWidget->addTab(tabInfo.notePadTab, tr("new"));
+    this->tabWidget->addTab(tabInfo.notePadTab, tr("new *"));
     connect(tabInfo.notePadTab, &QsciScintilla::textChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
     connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
 
@@ -508,8 +544,6 @@ void MainWindow::slotFileSave()
         QString filepath = QFileDialog::getSaveFileName(this, tmpStr, ".", "text(*.cpp *.h *.txt);;all(*.*)");
         if (filepath.isEmpty() == false) {
 
-            notePadTabActive->setFilePath(filepath);
-
             //把字窗口中的内容写进文件
             QFile file(this);
             file.setFileName(filepath);
@@ -520,11 +554,11 @@ void MainWindow::slotFileSave()
             }
             QTextStream stream(&file);
             //设置流的编码格式
-            //if (encoding == "UTF-8") {
+            if (this->enCoding == "utf-8") {
                 stream.setCodec("UTF-8");
-            //} else if (encoding == "GB2312") {
-            //    stream.setCodec("GB18030");
-            //}
+            } else {
+                stream.setCodec("GB18030");
+            }
             stream << notePadTabActive->text();
             stream.flush();
             file.close();
@@ -537,6 +571,15 @@ void MainWindow::slotFileSave()
             QString title = info.fileName();
             this->tabWidget->setTabText(index, title);
             notePadTabActive->setEditStatus(false);
+            notePadTabActive->setFilePath(filepath);
+
+            //修改list里面对应的名字
+            for (int i = 0; i < tabInfoList.size(); i++) {
+                if (tabInfoList[i].notePadTab == notePadTabActive) {
+                    tabInfoList[i].filePath = filepath;
+                    return;
+                }
+            }
         }
     }
     //保存之前打开的文件
@@ -557,11 +600,11 @@ void MainWindow::slotFileSave()
         }
         QTextStream stream(&file);
         //设置流的编码格式
-        //if (encoding == "UTF-8") {
+        if (this->enCoding == "utf-8") {
             stream.setCodec("UTF-8");
-        //} else if (encoding == "GB2312") {
-        //    stream.setCodec("GB18030");
-        //}
+        } else {
+            stream.setCodec("GB18030");
+        }
         stream << notePadTabActive->text();
         stream.flush();
         file.close();
@@ -592,6 +635,7 @@ void MainWindow::slotFileSaveAs()
         //新开一个tab, 显示刚才另存为的文件
         Tab_Info_t tabInfo;
         tabInfo.notePadTab = new NotePadTab(tabWidget);
+        tabInfo.notePadTab->setEncoding(this->enCoding);
         tabInfo.notePadTab->setEditStatus(false);
         tabInfo.filePath = filepath;
         tabInfo.notePadTab->setFilePath(tabInfo.filePath);
@@ -616,11 +660,11 @@ void MainWindow::slotFileSaveAs()
         }
         QTextStream stream(&file);
         //设置流的编码格式
-        //if (encoding == "UTF-8") {
+        if (this->enCoding == "utf-8") {
             stream.setCodec("UTF-8");
-        //} else if (encoding == "GB2312") {
-        //    stream.setCodec("GB18030");
-        //}
+        } else {
+            stream.setCodec("GB18030");
+        }
         stream << notePadTabActive->text();
         stream.flush();
         file.close();
@@ -677,7 +721,7 @@ void MainWindow::slotFileClose()
     int index = this->tabWidget->indexOf(notePadTabActive);
 
     //如果该窗体正在被编辑, 则要提示是否保存
-    if (notePadTabActive->getEditStatus() == true || notePadTabActive->getFileName() == "new") {
+    if (notePadTabActive->getEditStatus() == true) {
         QString tmpStr = "是否保存 ";
         tmpStr.append(notePadTabActive->getFileName());
         tmpStr.append(" ?");
@@ -740,7 +784,7 @@ bool MainWindow::slotFileCloseAll()
         int index = this->tabWidget->indexOf(notePadTabActive);
 
         //如果该窗体正在被编辑, 则要提示是否保存
-        if (notePadTabActive->getEditStatus() == true || notePadTabActive->getFileName() == "new") {
+        if (notePadTabActive->getEditStatus() == true) {
             QString tmpStr = "是否保存 ";
             tmpStr.append(notePadTabActive->getFileName());
             tmpStr.append(" ?");
@@ -876,6 +920,28 @@ void MainWindow::slotJumpLine()
 void MainWindow::slotSearch()
 {
 
+}
+
+/* 字体选择 */
+void MainWindow::slotFontSelection(void)
+{
+
+}
+
+/* 选择uft-8编码 */
+void MainWindow::slotEncodingUTF8(void)
+{
+    this->enCodingUTF8Act->setChecked(true);
+    this->enCodingGB2312Act->setChecked(false);
+    this->enCoding = "utf-8";
+}
+
+/* 选择gb2312编码 */
+void MainWindow::slotEncodingGB2312(void)
+{
+    this->enCodingUTF8Act->setChecked(false);
+    this->enCodingGB2312Act->setChecked(true);
+    this->enCoding = "gb2312";
 }
 
 /* 上一个tab */

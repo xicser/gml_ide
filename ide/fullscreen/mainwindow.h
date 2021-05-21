@@ -53,6 +53,12 @@ private:
     QAction *gotoLineAct;                       //转到行
     QAction *preferenceAct;                     //首选项
 
+    QMenu   *formatMenu;                        //文本格式菜单
+    QAction *fontAct;                           //字体选择
+    QMenu   *enCodingMenu;                      //字符编码格式子菜单
+    QAction *enCodingUTF8Act;                   //UTF-8
+    QAction *enCodingGB2312Act;                 //GB2312
+
     QMenu   *buildMenu;                         //构建菜单
     QAction *compileAct;                        //编译
     QAction *deployAct;                         //部署
@@ -76,11 +82,13 @@ private:
     void init();                                //初始化
     void setupFileMenu();                       //文件菜单功能实现
     void setupEditMenu();                       //编辑菜单功能实现
+    void setupFormatMenu();                     //格式菜单功能实现
     void setupBuildMenu();                      //构建菜单功能实现
     void setupWindowMenu();                     //窗口菜单功能实现
     void setupHelpMenu();                       //帮助菜单功能实现
     void setupFileActions();                    //文件菜单Action设置
     void setupEditActions();                    //编辑菜单Action设置
+    void setupFormatActions();                  //格式菜单Action设置
     void setupBuildActions();                   //构建菜单Action设置
     void setupWindowActions();                  //窗口菜单Action设置
     void setupHelpActions();                    //帮助菜单Action设置
@@ -91,6 +99,8 @@ private:
         NotePadTab *notePadTab;                 //记事本指针
     } Tab_Info_t;
     QList<Tab_Info_t> tabInfoList;              //打开的tab信息list
+
+    QString enCoding;                           //编码格式(目前支持uft-8和gb2312)
 
 private slots:
     void slotFileOpen();                        //打开文件
@@ -113,6 +123,10 @@ private slots:
     void slotPaste();                           //粘贴
     void slotJumpLine();                        //转到行
     void slotSearch();                          //查找
+
+    void slotFontSelection(void);               //字体选择
+    void slotEncodingUTF8(void);                //选择uft-8编码
+    void slotEncodingGB2312(void);              //选择gb2312编码
 
     void slotNextTab();                         //上一个tab
     void slotPrevTab();                         //下一个tab

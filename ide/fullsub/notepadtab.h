@@ -4,6 +4,7 @@
 #include <QTextEdit>
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexerpython.h>
+#include <Qsci/qscilexercpp.h>
 #include <Qsci/qsciapis.h>
 
 class NotePadTab : public QsciScintilla
@@ -20,15 +21,19 @@ public:
     void setFilePath(QString filePath);         //设置文件路径
     QString getFilePath(void);                  //获取文件路径
     QString getFileName(void);                  //获取文件名称
+    void setEncoding(QString);                  //设置编码格式
+    QString getEncoding(void);                  //获取编码格式
 
 private:
     bool isEditing;                 //表征当前文本是否处于编辑状态
     QString filePath;               //打开的文件路径
     QString fileName;               //打开的文件名称
+    QString enCoding;               //编码格式(目前支持uft-8和gb2312)
 
-    QsciLexerPython *textLexer;     //词法分析器
+    QsciLexerCPP *textLexer;        //解析器
     QsciAPIs *apis;                 //代码提示
 
+    void editorInit(void);          //编辑器初始化
 
 public slots:
     void slotContentChanged(void);                  //文本内容改变时, 调用该槽发送signalContentHasChanged信号
