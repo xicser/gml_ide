@@ -62,6 +62,9 @@ void MainWindow::init()
     this->setAttribute(Qt::WA_DeleteOnClose);
     tabInfoList.clear();
     enCoding = "utf-8";
+    this->font.setFamily("Courier New");
+    this->font.setPointSize(12);
+    this->font.setWeight(QFont::Normal);
 
     setWindowIcon(QIcon(":/resource/notepad.png"));
     setWindowTitle("GML Integrated Development Environment");
@@ -468,6 +471,7 @@ void MainWindow::slotFileOpen()
     Tab_Info_t tabInfo;
     tabInfo.notePadTab = new NotePadTab(tabWidget);
     tabInfo.notePadTab->setEncoding(this->enCoding);
+    tabInfo.notePadTab->setLexerFont(this->font);
     tabInfo.notePadTab->setEditStatus(false);
     tabInfo.notePadTab->setFilePath(filename);
     tabInfo.filePath = filename;
@@ -510,6 +514,7 @@ void MainWindow::slotFileNew()
     Tab_Info_t tabInfo;
     tabInfo.notePadTab = new NotePadTab(tabWidget);
     tabInfo.notePadTab->setEncoding(this->enCoding);
+    tabInfo.notePadTab->setLexerFont(this->font);
     tabInfo.notePadTab->setEditStatus(true);
     tabInfo.filePath = "new";
     tabInfo.notePadTab->setFilePath(tabInfo.filePath);
@@ -636,6 +641,7 @@ void MainWindow::slotFileSaveAs()
         Tab_Info_t tabInfo;
         tabInfo.notePadTab = new NotePadTab(tabWidget);
         tabInfo.notePadTab->setEncoding(this->enCoding);
+        tabInfo.notePadTab->setLexerFont(this->font);
         tabInfo.notePadTab->setEditStatus(false);
         tabInfo.filePath = filepath;
         tabInfo.notePadTab->setFilePath(tabInfo.filePath);
@@ -923,9 +929,18 @@ void MainWindow::slotSearch()
 }
 
 /* 字体选择 */
-void MainWindow::slotFontSelection(void)
+void MainWindow::slotFontSelection()
 {
+    bool ok;
+    QFont font = QFontDialog::getFont(&ok, this->font, this);
+    if (ok == false) {
+        return;
+    }
 
+    this->font = font;
+    for (int i = 0; i < this->tabInfoList.size(); i++) {
+        this->tabInfoList[i].notePadTab->setLexerFont(font);
+    }
 }
 
 /* 选择uft-8编码 */

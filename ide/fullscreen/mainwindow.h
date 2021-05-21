@@ -101,6 +101,7 @@ private:
     QList<Tab_Info_t> tabInfoList;              //打开的tab信息list
 
     QString enCoding;                           //编码格式(目前支持uft-8和gb2312)
+    QFont   font;                               //显示字体
 
 private slots:
     void slotFileOpen();                        //打开文件
@@ -124,9 +125,9 @@ private slots:
     void slotJumpLine();                        //转到行
     void slotSearch();                          //查找
 
-    void slotFontSelection(void);               //字体选择
-    void slotEncodingUTF8(void);                //选择uft-8编码
-    void slotEncodingGB2312(void);              //选择gb2312编码
+    void slotFontSelection();                   //字体选择
+    void slotEncodingUTF8();                    //选择uft-8编码
+    void slotEncodingGB2312();                  //选择gb2312编码
 
     void slotNextTab();                         //上一个tab
     void slotPrevTab();                         //下一个tab

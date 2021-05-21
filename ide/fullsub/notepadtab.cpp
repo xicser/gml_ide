@@ -48,7 +48,6 @@ void NotePadTab::editorInit(void)
     //代码提示
     //设置C++解析器
     textLexer = new QsciLexerCPP(this);
-    textLexer->setFont(font);
     this->setLexer(textLexer);
     apis = new QsciAPIs(textLexer);
     apis->add(QString("import")); //添加可提示的单词
@@ -115,6 +114,19 @@ void NotePadTab::setEncoding(QString encoding)
 QString NotePadTab::getEncoding(void)
 {
     return this->enCoding;
+}
+
+/* 设置显示字体 */
+void NotePadTab::setLexerFont(QFont font)
+{
+    this->font = font;
+    textLexer->setFont(this->font);
+}
+
+/* 设置显示字体 */
+QFont NotePadTab::getLexerFont(void)
+{
+    return this->font;
 }
 
 /* 文本内容改变时, 调用该槽发送signalContentHasChanged信号 */

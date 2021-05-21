@@ -23,12 +23,15 @@ public:
     QString getFileName(void);                  //获取文件名称
     void setEncoding(QString);                  //设置编码格式
     QString getEncoding(void);                  //获取编码格式
+    void setLexerFont(QFont);                   //设置显示字体
+    QFont getLexerFont(void);                   //设置显示字体
 
 private:
-    bool isEditing;                 //表征当前文本是否处于编辑状态
+    bool    isEditing;              //表征当前文本是否处于编辑状态
     QString filePath;               //打开的文件路径
     QString fileName;               //打开的文件名称
     QString enCoding;               //编码格式(目前支持uft-8和gb2312)
+    QFont   font;                   //显示字体
 
     QsciLexerCPP *textLexer;        //解析器
     QsciAPIs *apis;                 //代码提示
