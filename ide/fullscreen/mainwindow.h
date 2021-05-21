@@ -122,6 +122,7 @@ private slots:
     void slotCut();                             //剪切
     void slotCopy();                            //复制
     void slotPaste();                           //粘贴
+    void slotSelectAll();                       //全选
     void slotJumpLine();                        //转到行
     void slotSearch();                          //查找
 

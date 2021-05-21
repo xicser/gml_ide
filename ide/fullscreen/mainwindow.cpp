@@ -403,7 +403,7 @@ void MainWindow::setupEditActions()
     connect(cutAct, &QAction::triggered, this, &MainWindow::slotCut);
     connect(copyAct, &QAction::triggered, this, &MainWindow::slotCopy);
     connect(pasteAct, &QAction::triggered, this, &MainWindow::slotPaste);
-//    connect(selectAllAct,SIGNAL(triggered()),EDITOR,SLOT(selectAll()));
+    connect(selectAllAct, &QAction::triggered, this, &MainWindow::slotSelectAll);
 //    connect(upperCaseAct,SIGNAL(triggered()),EDITOR,SLOT(toUpperCase()));
 //    connect(lowerCaseAct,SIGNAL(triggered()),EDITOR,SLOT(toLowerCase()));
 //    connect(gotoLineAct,SIGNAL(triggered()),this,SLOT(gotoLine()));
@@ -914,6 +914,19 @@ void MainWindow::slotPaste(void)
     //先获取当前活动的子窗体
     NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
     notePadTabActive->paste();
+}
+
+/* 全选 */
+void MainWindow::slotSelectAll()
+{
+    //根本没有打开的子窗体, 直接返回
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
+
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+    notePadTabActive->selectAll();
 }
 
 /* 转到行 */
