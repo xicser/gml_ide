@@ -10,6 +10,8 @@
 #include "fullsub/treelayerview.h"
 #include "fullsub/logtextedit.h"
 #include "fullsub/notepadtab.h"
+#include "fullsub/searchdialog.h"
+
 
 class MainWindow: public QMainWindow
 {
@@ -49,7 +51,7 @@ private:
     QAction *selectAllAct;                      //全选
     QAction *upperCaseAct;                      //转换为大写
     QAction *lowerCaseAct;                      //转换为小写
-    QAction *findAct;                           //查找和替换
+    QAction *findAct;                           //查找
     QAction *gotoLineAct;                       //转到行
     QAction *preferenceAct;                     //首选项
 
@@ -93,6 +95,8 @@ private:
     void setupWindowActions();                  //窗口菜单Action设置
     void setupHelpActions();                    //帮助菜单Action设置
 
+    SearchDialog *searchDialog;                 //查找子窗口
+
     //每个tab的信息
     typedef struct {
         QString filePath;                       //打开的文件路径
@@ -125,8 +129,8 @@ private slots:
     void slotSelectAll();                       //全选
     void slotToUpperCase();                     //转为大写
     void slotToLowerCase();                     //转为小写
+    void slotSearchAndReplace();                //查找
     void slotJumpLine();                        //转到行
-    void slotSearch();                          //查找
 
     void slotFontSelection();                   //字体选择
     void slotEncodingUTF8();                    //选择uft-8编码

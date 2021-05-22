@@ -46,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     qDebug() << "~MainWindow";
+    delete searchDialog;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -59,13 +60,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //初始化
 void MainWindow::init()
 {
-    this->setAttribute(Qt::WA_DeleteOnClose);
+    searchDialog = nullptr;
     tabInfoList.clear();
     enCoding = "utf-8";
     this->font.setFamily("Courier New");
     this->font.setPointSize(12);
     this->font.setWeight(QFont::Normal);
 
+    this->setAttribute(Qt::WA_DeleteOnClose);
     setWindowIcon(QIcon(":/resource/notepad.png"));
     setWindowTitle("GML Integrated Development Environment");
 
@@ -270,8 +272,8 @@ void MainWindow::setupEditMenu()
     gotoLineAct->setShortcut(Qt::CTRL + Qt::Key_G);
     editMenu->addAction(gotoLineAct);
 
-    //查找和替换
-    findAct = new QAction(QIcon(tr(":/resource/editfind.png")), tr("&Find/Replace"),
+    //查找
+    findAct = new QAction(QIcon(tr(":/resource/editfind.png")), tr("&Find"),
                           this);
     findAct->setShortcut(QKeySequence::Find);
     editMenu->addAction(findAct);
@@ -406,8 +408,8 @@ void MainWindow::setupEditActions()
     connect(selectAllAct, &QAction::triggered, this, &MainWindow::slotSelectAll);
     connect(upperCaseAct, &QAction::triggered, this, &MainWindow::slotToUpperCase);
     connect(lowerCaseAct, &QAction::triggered, this, &MainWindow::slotToLowerCase);
+    connect(findAct, &QAction::triggered, this, &MainWindow::slotSearchAndReplace);
 //    connect(gotoLineAct,SIGNAL(triggered()),this,SLOT(gotoLine()));
-//    connect(findAct,SIGNAL(triggered()),this,SLOT(search()));
 }
 
 /* 格式菜单Action设置 */
@@ -957,14 +959,26 @@ void MainWindow::slotToLowerCase()
     notePadTabActive->replaceSelectedText(selectedStr);
 }
 
-/* 转到行 */
-void MainWindow::slotJumpLine()
+/* 查找 */
+void MainWindow::slotSearchAndReplace()
 {
+    //根本没有打开的子窗体, 直接返回
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
 
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+    if (searchDialog != nullptr) {
+        delete searchDialog;
+        searchDialog = nullptr;
+    }
+    searchDialog = new SearchDialog(notePadTabActive);
+    searchDialog->show();
 }
 
-/* 查找 */
-void MainWindow::slotSearch()
+/* 转到行 */
+void MainWindow::slotJumpLine()
 {
 
 }

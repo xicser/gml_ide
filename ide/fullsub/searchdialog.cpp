@@ -1,84 +1,78 @@
 #include "searchdialog.h"
+#include "ui_searchdialog.h"
+#include <QDebug>
 
-SearchDialog::SearchDialog(QWidget *parent) :
-    QWidget(parent)
+SearchDialog::SearchDialog(NotePadTab *notePadTabActive) :
+    QWidget(nullptr), ui(new Ui::SearchDialog), notePadTabActive(notePadTabActive)
 {
-    setupUi(this);
-    setWindowIcon(QIcon(tr(":images/notepad.png")));
-    setWindowTitle(tr("Search & Replace"));
-//    findCombo->setMaxCount(config->maxHistory);
-//    findCombo->addItems(config->findHistory);
-    findCombo->setCurrentIndex(-1);
+    ui->setupUi(this);
 
-//    replaceCombo->setMaxCount(config->maxHistory);
-//    replaceCombo->addItems(config->replaceHistory);
-//    replaceCombo->setCurrentIndex(-1);
+    setWindowIcon(QIcon(tr(":resource/notepad.png")));
+    setWindowTitle(tr("Find"));
+    setWindowFlags(this->windowFlags() &~ Qt::WindowMaximizeButtonHint);
 
-//    matchCaseCheck->setChecked(config->matchCase);
-//    regExpCheck->setChecked(config->regExp);
+    ui->findCombo->setCurrentIndex(-1);
+    ui->replaceCombo->setCurrentIndex(-1);
 
-    connect(findNextButton, SIGNAL(clicked()), SLOT(search()));
-    connect(findPreviousButton, SIGNAL(clicked()), SLOT(search()));
-    connect(replaceNextButton, SIGNAL(clicked()), SLOT(replace()));
-    connect(replacePreviousButton, SIGNAL(clicked()), SLOT(replace()));
-    connect(replaceAllButton, SIGNAL(clicked()), SLOT(replace()));
+    connect(ui->findNextButton, &QToolButton::clicked, this, &SearchDialog::slotSearchForward);
+    connect(ui->findPreviousButton, &QToolButton::clicked, this, &SearchDialog::slotSearchBackward);
+    connect(ui->replaceBtn, &QToolButton::clicked, this, &SearchDialog::slotReplace);
+    connect(ui->replaceAllBtn, &QToolButton::clicked, this, &SearchDialog::slotReplaceAll);
 }
 
 SearchDialog::~SearchDialog()
 {
-//    config->matchCase = matchCaseCheck->isChecked();
-//    config->regExp = regExpCheck->isChecked();
-
-//    config->findHistory.clear();
-
-//    for (int i = 0; i < findCombo->count(); i++)
-//        config->findHistory << findCombo->itemText(i);
-
-//    config->replaceHistory.clear();
-
-//    for (int i = 0; i < replaceCombo->count(); i++)
-//        config->replaceHistory << replaceCombo->itemText(i);
+    delete ui;
 }
 
-//查找
-void SearchDialog::search()
+//向前查找
+void SearchDialog::slotSearchForward()
 {
-    update (findCombo);
-
-    bool backward = (sender() == findPreviousButton) ? true : false;
-
-    emit search(findCombo->currentText(), backward, matchCaseCheck->isChecked(),
-                regExpCheck->isChecked());
-}
-
-//替换
-void SearchDialog::replace()
-{
-    update (findCombo);
-    update (replaceCombo);
-
-    if (sender() == replaceAllButton)
-    {
-        emit replaceAll(findCombo->currentText(), replaceCombo->currentText(),
-                        matchCaseCheck->isChecked(), regExpCheck->isChecked());
+    QString textToSearch = ui->findCombo->currentText();
+    bool regularExp, caseSensitive, matchWholeWord, wrap;
+    regularExp = ui->regExpCheck->isChecked();
+    caseSensitive = ui->matchCaseCheck->isChecked();
+    matchWholeWord = ui->matchWholeWordCheck->isChecked();
+    wrap = ui->wrapAroundCheck->isChecked();
+    bool forward;
+    if (ui->forwardRBtn->isChecked() == true) {
+        forward = true;
+    } else {
+        forward = false;
     }
-    else
-    {
-        bool backward = (sender() == replacePreviousButton) ? true : false;
-
-        emit replace(findCombo->currentText(), replaceCombo->currentText(),
-                     backward, matchCaseCheck->isChecked(),
-                     regExpCheck->isChecked());
-    }
+    int line, index;
+    notePadTabActive->getCursorPosition(&line, &index);
+    notePadTabActive->findFirst(textToSearch, regularExp, caseSensitive, matchWholeWord, wrap, forward, line, index, true, false);
 }
 
-//更新查找/替换历史
-void SearchDialog::update(QComboBox *combo)
+//向后查找
+void SearchDialog::slotSearchBackward()
 {
-    int index = combo->findText(combo->currentText());
+    QString textToSearch = ui->findCombo->currentText();
+    bool regularExp, caseSensitive, matchWholeWord, wrap;
+    regularExp = ui->regExpCheck->isChecked();
+    caseSensitive = ui->matchCaseCheck->isChecked();
+    matchWholeWord = ui->matchWholeWordCheck->isChecked();
+    wrap = ui->wrapAroundCheck->isChecked();
+    bool forward;
+    if (ui->forwardRBtn->isChecked() == true) {
+        forward = false;
+    } else {
+        forward = true;
+    }
+    int line, index;
+    notePadTabActive->getCursorPosition(&line, &index);
+    notePadTabActive->findFirst(textToSearch, regularExp, caseSensitive, matchWholeWord, wrap, forward, line, index, true, false);
+}
 
-    if (index == -1)
-        combo->insertItem(0, combo->currentText());
-    else
-        combo->setCurrentIndex(index);
+/* 替换 */
+void SearchDialog::slotReplace()
+{
+
+}
+
+/* 替换所有 */
+void SearchDialog::slotReplaceAll()
+{
+
 }
