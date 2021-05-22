@@ -273,7 +273,7 @@ void MainWindow::setupEditMenu()
     editMenu->addAction(gotoLineAct);
 
     //查找
-    findAct = new QAction(QIcon(tr(":/resource/editfind.png")), tr("&Find"),
+    findAct = new QAction(QIcon(tr(":/resource/editfind.png")), tr("&Find & Replace"),
                           this);
     findAct->setShortcut(QKeySequence::Find);
     editMenu->addAction(findAct);

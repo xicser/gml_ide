@@ -8,8 +8,9 @@ SearchDialog::SearchDialog(NotePadTab *notePadTabActive) :
     ui->setupUi(this);
 
     setWindowIcon(QIcon(tr(":resource/notepad.png")));
-    setWindowTitle(tr("Find"));
+    setWindowTitle(tr("Find & Replace"));
     setWindowFlags(this->windowFlags() &~ Qt::WindowMaximizeButtonHint);
+    setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
 
     ui->findCombo->setCurrentIndex(-1);
     ui->replaceCombo->setCurrentIndex(-1);
@@ -42,6 +43,7 @@ void SearchDialog::slotSearchForward()
     }
     int line, index;
     notePadTabActive->getCursorPosition(&line, &index);
+    index -= 1; //为什么-1, 参考这里https://riverbankcomputing.com/pipermail/qscintilla/2011-June/000737.html
     notePadTabActive->findFirst(textToSearch, regularExp, caseSensitive, matchWholeWord, wrap, forward, line, index, true, false);
 }
 
@@ -62,17 +64,45 @@ void SearchDialog::slotSearchBackward()
     }
     int line, index;
     notePadTabActive->getCursorPosition(&line, &index);
+    index -= 1; //为什么-1, 参考这里https://riverbankcomputing.com/pipermail/qscintilla/2011-June/000737.html
     notePadTabActive->findFirst(textToSearch, regularExp, caseSensitive, matchWholeWord, wrap, forward, line, index, true, false);
 }
 
 /* 替换 */
 void SearchDialog::slotReplace()
 {
-
+    if (notePadTabActive->selectedText().isEmpty() == true) {
+        slotSearchForward();
+        return;
+    }
+    QString textToReplace = ui->replaceCombo->currentText();
+    if (textToReplace.isEmpty() == false) {
+        notePadTabActive->replaceSelectedText(textToReplace);
+        slotSearchForward();
+    }
 }
 
 /* 替换所有 */
 void SearchDialog::slotReplaceAll()
 {
-
+    QString textToReplace = ui->replaceCombo->currentText();
+    QString textToSearch = ui->findCombo->currentText();
+    if (textToReplace.isEmpty() == true || textToSearch.isEmpty() == true) {
+        return;
+    }
+    while (1) {
+        bool regularExp, caseSensitive, matchWholeWord;
+        regularExp = ui->regExpCheck->isChecked();
+        caseSensitive = ui->matchCaseCheck->isChecked();
+        matchWholeWord = ui->matchWholeWordCheck->isChecked();
+        int line, index;
+        notePadTabActive->getCursorPosition(&line, &index);
+        index -= 1; //为什么-1, 参考这里https://riverbankcomputing.com/pipermail/qscintilla/2011-June/000737.html
+        bool found = notePadTabActive->findFirst(textToSearch, regularExp, caseSensitive, matchWholeWord, true, true, line, index, true, false);
+        if (found == false) {
+            break;
+        } else {
+            notePadTabActive->replaceSelectedText(textToReplace);
+        }
+    }
 }
