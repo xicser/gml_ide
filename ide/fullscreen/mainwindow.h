@@ -71,7 +71,7 @@ private:
     QAction *nextAct;                           //下一个窗口
     QAction *previousAct;                       //上一个窗口
     QMenu   *recentlyFilesMenu;                 //最近关闭的窗口
-    QMenu   *currentAllMenu;                    //当前所有窗口
+    QMenu   *currentWindowsMenu;                //当前所有tab窗口
 
     QMenu   *helpMenu;                          //帮助菜单
     QAction *aboutAct;                          //关于本软件
@@ -108,6 +108,7 @@ private:
 
     QString enCoding;                           //编码格式(目前支持uft-8和gb2312)
     QFont   font;                               //显示字体
+    QActionGroup *currentWindowsActionGrp;      //Window Menu中Current Windows子Menu里的Action组
 
 private slots:
     void slotFileOpen();                        //打开文件
@@ -140,6 +141,8 @@ private slots:
 
     void slotNextTab();                         //上一个tab
     void slotPrevTab();                         //下一个tab
+    void slotCurrentWindows();                  //CurrentWindows
+
 
     void slotAbout();                           //关于本软件
 

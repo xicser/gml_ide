@@ -45,7 +45,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    qDebug() << "~MainWindow";
     delete searchDialog;
 }
 
@@ -361,8 +360,8 @@ void MainWindow::setupWindowMenu()
     windowMenu->addMenu(recentlyFilesMenu);
 
     //当前所有窗口
-    currentAllMenu = new QMenu(tr("Current Windows"), windowMenu);
-    windowMenu->addMenu(currentAllMenu);
+    currentWindowsMenu = new QMenu(tr("Current Windows"), windowMenu);
+    windowMenu->addMenu(currentWindowsMenu);
     topToolBar->addSeparator();
     menuBar->addMenu(windowMenu);
 }
@@ -433,9 +432,10 @@ void MainWindow::setupBuildActions()
 //窗口菜单Action设置
 void MainWindow::setupWindowActions()
 {
+    this->currentWindowsActionGrp = new QActionGroup(this);
     connect(nextAct, &QAction::triggered, this, &MainWindow::slotNextTab);
     connect(previousAct, &QAction::triggered, this, &MainWindow::slotPrevTab);
-//    connect(currentAllMenu, SIGNAL(aboutToShow()), SLOT(currentAllWindow()));
+    connect(currentWindowsMenu, &QMenu::aboutToShow, this, &MainWindow::slotCurrentWindows);
 //    connect(recentlyFilesMenu, SIGNAL(aboutToShow()), SLOT(updateRecentFiles()));
 }
 
@@ -1060,6 +1060,45 @@ void MainWindow::slotPrevTab()
             }
         }
     }
+}
+
+/* CurrentWindows */
+void MainWindow::slotCurrentWindows()
+{
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
+
+    QList<QAction *> actionList = currentWindowsMenu->actions();
+    for (int i = 0; i < actionList.size(); i++) {
+        currentWindowsActionGrp->removeAction(actionList[i]);
+        delete actionList[i];
+    }
+
+    NotePadTab *currentNotePadTab = static_cast<NotePadTab *>(tabWidget->currentWidget());
+
+    for (int i = 0; i < tabInfoList.size(); i++) {
+
+        QFileInfo info(tabInfoList[i].filePath);
+        QString title = info.fileName();
+        QAction *actionItem = new QAction(title, currentWindowsMenu);
+        actionItem->setCheckable(true);
+
+        if (tabInfoList[i].notePadTab == currentNotePadTab) {
+            actionItem->setChecked(true);
+        }
+
+        QVariant var = QVariant::fromValue(tabInfoList[i].notePadTab);
+        actionItem->setProperty("notePadTab *", var);
+        currentWindowsMenu->addAction(actionItem);
+        currentWindowsActionGrp->addAction(actionItem);
+    }
+
+    connect(currentWindowsActionGrp, &QActionGroup::triggered, [=](QAction *triggeredAction) {
+        QVariant var = triggeredAction->property("notePadTab *");
+        NotePadTab *notePadTab = var.value<NotePadTab *>();
+        tabWidget->setCurrentWidget(notePadTab);
+    });
 }
 
 //关于本软件
