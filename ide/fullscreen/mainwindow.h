@@ -73,7 +73,7 @@ private:
     QMenu   *windowMenu;                        //窗口菜单
     QAction *nextAct;                           //下一个窗口
     QAction *previousAct;                       //上一个窗口
-    QMenu   *recentlyFilesMenu;                 //最近关闭的窗口
+    QMenu   *recentlyFilesMenu;                 //最近使用过文件的窗口
     QMenu   *currentWindowsMenu;                //当前所有tab窗口
 
     QMenu   *helpMenu;                          //帮助菜单
@@ -112,7 +112,10 @@ private:
     QString enCoding;                           //编码格式(目前支持uft-8和gb2312)
     QFont   font;                               //显示字体
     QActionGroup *currentWindowsActionGrp;      //Window Menu中Current Windows子Menu里的Action组
+    QActionGroup *recentlyFilesActionGrp;       //Window Menu中Recently Files子Menu里的Action组
     GmlDataBase  *gmlDataBase;                  //存放配置信息等的数据库
+
+    void openFileWithFilePath(QString filepath);  //根据文件路径打开文件
 
 private slots:
     void slotFileOpen();                        //打开文件

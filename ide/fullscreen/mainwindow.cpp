@@ -64,7 +64,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-//初始化
+/* 初始化 */
 void MainWindow::init()
 {
     gmlDataBase = nullptr;
@@ -129,7 +129,7 @@ void MainWindow::init()
     setMinimumSize(screenXSize * 0.5, screenYSize * 0.5);
 }
 
-//文件菜单功能实现
+/* 文件菜单功能实现 */
 void MainWindow::setupFileMenu()
 {
     fileMenu = new QMenu(tr("&File"), menuBar);
@@ -217,7 +217,7 @@ void MainWindow::setupFileMenu()
     menuBar->addMenu(fileMenu);
 }
 
-//编辑菜单功能实现
+/* 编辑菜单功能实现 */
 void MainWindow::setupEditMenu()
 {
     editMenu = new QMenu(tr("&Edit"), menuBar);
@@ -347,7 +347,7 @@ void MainWindow::setupBuildMenu()
     buildToolBar->addAction(runAct);
 }
 
-//窗口菜单功能实现
+/* 窗口菜单功能实现 */
 void MainWindow::setupWindowMenu()
 {
     windowMenu = new QMenu(tr("&Window"), menuBar);
@@ -376,7 +376,7 @@ void MainWindow::setupWindowMenu()
     menuBar->addMenu(windowMenu);
 }
 
-//帮助菜单功能实现
+/* 帮助菜单功能实现 */
 void MainWindow::setupHelpMenu()
 {
     helpMenu = new QMenu(tr("&Help"), menuBar);
@@ -389,7 +389,7 @@ void MainWindow::setupHelpMenu()
     menuBar->addMenu(helpMenu);
 }
 
-//文件菜单Action设置
+/* 文件菜单Action设置 */
 void MainWindow::setupFileActions()
 {
     connect(openAct, &QAction::triggered, this, &MainWindow::slotFileOpen);
@@ -408,7 +408,7 @@ void MainWindow::setupFileActions()
     connect(exitAct, &QAction::triggered, this, &MainWindow::slotCloseWindow);
 }
 
-//编辑菜单Action设置
+/* 编辑菜单Action设置 */
 void MainWindow::setupEditActions()
 {
     connect(undoAct, &QAction::triggered, this, &MainWindow::slotUndo);
@@ -443,6 +443,7 @@ void MainWindow::setupBuildActions()
 void MainWindow::setupWindowActions()
 {
     this->currentWindowsActionGrp = new QActionGroup(this);
+    this->recentlyFilesActionGrp = new QActionGroup(this);
     connect(nextAct, &QAction::triggered, this, &MainWindow::slotNextTab);
     connect(previousAct, &QAction::triggered, this, &MainWindow::slotPrevTab);
     connect(currentWindowsMenu, &QMenu::aboutToShow, this, &MainWindow::slotCurrentWindows);
@@ -455,13 +456,10 @@ void MainWindow::setupHelpActions()
     connect(aboutAct, &QAction::triggered, this, &MainWindow::slotAbout);
 }
 
-/* 打开文件 */
-void MainWindow::slotFileOpen()
+/* 根据文件路径打开文件 */
+void MainWindow::openFileWithFilePath(QString filepath)
 {
-    QString filename = QFileDialog::getOpenFileName(this, tr("选择文本文件"), ".",
-             "text(*.cpp *.h *.txt);;all(*.*)");
-
-    if (filename.isEmpty()) {
+    if (filepath.isEmpty()) {
         return;
     }
 
@@ -469,7 +467,7 @@ void MainWindow::slotFileOpen()
     bool hasOpened = false;
     int index;
     for (int i = 0; i < tabInfoList.size(); i++) {
-        if (tabInfoList[i].filePath == filename) {
+        if (tabInfoList[i].filePath == filepath) {
             hasOpened = true;
             index = i;
             break;
@@ -481,23 +479,26 @@ void MainWindow::slotFileOpen()
         return;
     }
 
+    //保存这个文件路径到最近打开文件列表
+    gmlDataBase->insertRencentFileList(filepath);
+
     //创建一个新的tab
     Tab_Info_t tabInfo;
     tabInfo.notePadTab = new NotePadTab(tabWidget);
     tabInfo.notePadTab->setEncoding(this->enCoding);
     tabInfo.notePadTab->setLexerFont(this->font);
     tabInfo.notePadTab->setEditStatus(false);
-    tabInfo.notePadTab->setFilePath(filename);
-    tabInfo.filePath = filename;
+    tabInfo.notePadTab->setFilePath(filepath);
+    tabInfo.filePath = filepath;
     tabInfoList << tabInfo;
 
     //获取文件名
-    QFileInfo info(filename);
+    QFileInfo info(filepath);
     QString title = info.fileName();
 
     //打开文件(用流的方式)
     QFile file(this);
-    file.setFileName(filename);
+    file.setFileName(filepath);
     bool ret = file.open(QIODevice::ReadOnly | QIODevice::Text);
     if (ret == false) {
         QMessageBox::warning(this, "错误", "打开出错！");
@@ -519,6 +520,14 @@ void MainWindow::slotFileOpen()
     //聚焦到刚刚打开的文件tab上
     this->tabWidget->setCurrentWidget(tabInfo.notePadTab);
     tabInfo.notePadTab->setFocus();
+}
+
+/* 打开文件 */
+void MainWindow::slotFileOpen()
+{
+    QString filepath = QFileDialog::getOpenFileName(this, tr("选择文本文件"), ".",
+             "text(*.cpp *.h *.txt);;all(*.*)");
+    openFileWithFilePath(filepath);
 }
 
 /* 新建文件 */
@@ -562,6 +571,9 @@ void MainWindow::slotFileSave()
 
         QString filepath = QFileDialog::getSaveFileName(this, tmpStr, ".", "text(*.cpp *.h *.txt);;all(*.*)");
         if (filepath.isEmpty() == false) {
+
+            //保存这个文件路径到最近打开文件列表
+            gmlDataBase->insertRencentFileList(filepath);
 
             //把字窗口中的内容写进文件
             QFile file(this);
@@ -1079,6 +1091,7 @@ void MainWindow::slotCurrentWindows()
         return;
     }
 
+    //先把之前的action清除掉
     QList<QAction *> actionList = currentWindowsMenu->actions();
     for (int i = 0; i < actionList.size(); i++) {
         currentWindowsActionGrp->removeAction(actionList[i]);
@@ -1114,15 +1127,35 @@ void MainWindow::slotCurrentWindows()
 /* 最近打开文件 */
 void MainWindow::slotRecentFiles()
 {
+    //从数据库里读取
     QStringList *recentFilePathList = gmlDataBase->readRencentFileList();
     if (recentFilePathList->isEmpty() == true) {
         return;
     }
 
+    //先把之前的action清除掉
+    QList<QAction *> actionList = recentlyFilesMenu->actions();
+    for (int i = 0; i < actionList.size(); i++) {
+        recentlyFilesActionGrp->removeAction(actionList[i]);
+        delete actionList[i];
+    }
 
+    //遍历, 重新添加
+    for (int i = 0; i < recentFilePathList->size(); i++) {
+        QString filePath = recentFilePathList->at(i);
+        QAction *actionItem = new QAction(filePath, recentlyFilesMenu);
+
+        recentlyFilesActionGrp->addAction(actionItem);
+        recentlyFilesMenu->addAction(actionItem);
+    }
+
+    connect(recentlyFilesActionGrp, &QActionGroup::triggered, [=](QAction *triggeredAction) {
+        QString filepath = triggeredAction->text();
+        openFileWithFilePath(filepath);
+    });
 }
 
-//关于本软件
+/* 关于本软件 */
 void MainWindow::slotAbout()
 {
     QMessageBox::about(this, tr("About"), tr("This example demonstrates Qt's "

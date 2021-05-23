@@ -17,6 +17,7 @@ public:
 private:
     QSqlDatabase db;
     QStringList recentFilePathList;         //最近打开文件string list
+    static unsigned int recentFileId;       //最近打开文件表中的id
 
     void dbInit();                          //数据库初始化
 
