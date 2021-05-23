@@ -13,6 +13,7 @@ public:
 
     QStringList *readRencentFileList(void);         //读取最近打开文件列表
     void insertRencentFileList(QString filepath);   //往最近打开文件列表里插入一项
+    void clearRencentFileList();                    //清空最近打开文件列表
 
 private:
     QSqlDatabase db;

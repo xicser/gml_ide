@@ -354,20 +354,22 @@ void MainWindow::setupWindowMenu()
 
     //上一个窗口
     previousAct = new QAction(QIcon(tr(":/resource/previous.png")),
-                              tr("Previous Window"), this);
+                              tr("Previous Window"), windowMenu);
     previousAct->setShortcut(Qt::CTRL + Qt::Key_Left);
     windowMenu->addAction(previousAct);
     topToolBar->addAction(previousAct);
 
     //下一个窗口
-    nextAct = new QAction(QIcon(tr(":/resource/next.png")), tr("Next Window"), this);
+    nextAct = new QAction(QIcon(tr(":/resource/next.png")), tr("Next Window"), windowMenu);
     nextAct->setShortcut(Qt::CTRL + Qt::Key_Right);
     windowMenu->addAction(nextAct);
     topToolBar->addAction(nextAct);
 
-    //最近关闭的文件
+    //最近使用过的文件窗口
     recentlyFilesMenu = new QMenu(tr("Recently Files"), windowMenu);
     windowMenu->addMenu(recentlyFilesMenu);
+    clearRecentlyAct = new QAction(tr("Clear History"), recentlyFilesMenu);
+    recentlyFilesMenu->addAction(clearRecentlyAct);
 
     //当前所有窗口
     currentWindowsMenu = new QMenu(tr("Current Windows"), windowMenu);
@@ -439,7 +441,7 @@ void MainWindow::setupBuildActions()
 //    connect(runAct,SIGNAL(triggered()),EDITOR,SLOT(undo()));
 }
 
-//窗口菜单Action设置
+/* 窗口菜单Action设置 */
 void MainWindow::setupWindowActions()
 {
     this->currentWindowsActionGrp = new QActionGroup(this);
@@ -448,9 +450,10 @@ void MainWindow::setupWindowActions()
     connect(previousAct, &QAction::triggered, this, &MainWindow::slotPrevTab);
     connect(currentWindowsMenu, &QMenu::aboutToShow, this, &MainWindow::slotCurrentWindows);
     connect(recentlyFilesMenu, &QMenu::aboutToShow, this, &MainWindow::slotRecentFiles);
+    connect(clearRecentlyAct, &QAction::triggered, this, &MainWindow::slotClearRecentFiles);
 }
 
-//帮助Action设置
+/* 帮助Action设置 */
 void MainWindow::setupHelpActions()
 {
     connect(aboutAct, &QAction::triggered, this, &MainWindow::slotAbout);
@@ -1130,8 +1133,20 @@ void MainWindow::slotRecentFiles()
     //从数据库里读取
     QStringList *recentFilePathList = gmlDataBase->readRencentFileList();
     if (recentFilePathList->isEmpty() == true) {
-        return;
+
+        recentlyFilesMenu->removeAction(clearRecentlyAct);
+
+        //把之前的action清除掉
+        QList<QAction *> actionList = recentlyFilesMenu->actions();
+        for (int i = 0; i < actionList.size(); i++) {
+            recentlyFilesActionGrp->removeAction(actionList[i]);
+            delete actionList[i];
+        }
+
+        recentlyFilesMenu->addAction(clearRecentlyAct);
     }
+
+    recentlyFilesMenu->removeAction(clearRecentlyAct);
 
     //先把之前的action清除掉
     QList<QAction *> actionList = recentlyFilesMenu->actions();
@@ -1149,10 +1164,19 @@ void MainWindow::slotRecentFiles()
         recentlyFilesMenu->addAction(actionItem);
     }
 
+    recentlyFilesMenu->addSeparator();
+    recentlyFilesMenu->addAction(clearRecentlyAct);
+
     connect(recentlyFilesActionGrp, &QActionGroup::triggered, [=](QAction *triggeredAction) {
         QString filepath = triggeredAction->text();
-        openFileWithFilePath(filepath);
+        openFileWithFilePath(filepath); //打开
     });
+}
+
+/* 清除最近打开文件记录 */
+void MainWindow::slotClearRecentFiles()
+{
+    gmlDataBase->clearRencentFileList();
 }
 
 /* 关于本软件 */

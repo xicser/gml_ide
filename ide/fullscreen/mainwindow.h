@@ -74,6 +74,7 @@ private:
     QAction *nextAct;                           //下一个窗口
     QAction *previousAct;                       //上一个窗口
     QMenu   *recentlyFilesMenu;                 //最近使用过文件的窗口
+    QAction *clearRecentlyAct;                  //清除最近使用过的文件
     QMenu   *currentWindowsMenu;                //当前所有tab窗口
 
     QMenu   *helpMenu;                          //帮助菜单
@@ -150,6 +151,7 @@ private slots:
     void slotPrevTab();                         //下一个tab
     void slotCurrentWindows();                  //CurrentWindows
     void slotRecentFiles();                     //最近打开文件
+    void slotClearRecentFiles();                //清除最近打开文件记录
 
     void slotAbout();                           //关于本软件
 

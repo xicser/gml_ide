@@ -59,7 +59,6 @@ void GmlDataBase::insertRencentFileList(QString filepath)
     if (rowCnt >= 10) {
         //删除一条最老的记录
         QString deleteCmd = QString("delete from RecentFilePath where id = (select id from(select min(id) id from RecentFilePath) t1)");
-        deleteCmd;
         query.exec(deleteCmd);
     }
 
@@ -72,4 +71,12 @@ void GmlDataBase::insertRencentFileList(QString filepath)
     //生成sql语句
     QString insertCmd = QString("insert into RecentFilePath(id, filepath) values('%1', '%2')").arg(recentFileId++).arg(filepath);
     query.exec(insertCmd);
+}
+
+/* 清空最近打开文件列表 */
+void GmlDataBase::clearRencentFileList()
+{
+    QSqlQuery query;
+    QString deleteCmd = QString("delete from RecentFilePath");
+    query.exec(deleteCmd);
 }
