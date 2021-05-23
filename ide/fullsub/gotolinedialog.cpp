@@ -1,29 +1,40 @@
 #include "gotolinedialog.h"
 #include "ui_gotolinedialog.h"
+#include <QDebug>
 
-GoToLineDialog::GoToLineDialog(QWidget *parent) :
-    QWidget(parent), ui(new Ui::GoToLineDialog)
+GotolineDialog::GotolineDialog(NotePadTab *notePadTabActive) :
+    QWidget(nullptr), ui(new Ui::GotolineDialog), notePadTabActive(notePadTabActive)
 {
     ui->setupUi(this);
-    setWindowIcon(QIcon(tr(":images/notepad.png")));
-    setWindowTitle(tr("Goto Line"));
-    connect(ui->pushButton, SIGNAL(clicked()), SLOT(gotoLine()));
+
+    setWindowIcon(QIcon(tr(":resource/notepad.png")));
+    setWindowTitle(tr("Go To Line..."));
+    setWindowFlags(this->windowFlags() &~ Qt::WindowMaximizeButtonHint);
+    setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
+
+    connect(ui->goBtn, &QPushButton::clicked, this, &GotolineDialog::slotGoBtnClicked);
 }
 
-//设置行号最大范围
-void GoToLineDialog::setMaxLineNumber(int lineNumber)
-{
-    ui->spinBox->setMaximum(lineNumber);
-}
-
-//转到行
-void GoToLineDialog::gotoLine()
-{
-    int lineNumber = ui->spinBox->value();
-    emit gotoLine(lineNumber);
-}
-
-GoToLineDialog::~GoToLineDialog()
+GotolineDialog::~GotolineDialog()
 {
     delete ui;
+}
+
+/* go按钮按下 */
+void GotolineDialog::slotGoBtnClicked()
+{
+    int lineMax = notePadTabActive->lines();
+    int lineToGo = ui->lineSpinBox->value();
+
+    if (lineToGo < 1) {
+        return;
+    }
+
+    if (lineToGo > lineMax) {
+        notePadTabActive->setCursorPosition(lineMax - 1, 0);
+    } else {
+        notePadTabActive->setCursorPosition(lineToGo - 1, 0);
+    }
+
+    emit signalGoToLineDone();
 }

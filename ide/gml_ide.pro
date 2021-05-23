@@ -12,7 +12,8 @@ HEADERS += \
     fullsub/treelayerview.h \
     fullsub/logtextedit.h \
     fullsub/notepadtab.h \
-    fullsub/searchdialog.h
+    fullsub/searchdialog.h \
+    fullsub/gotolinedialog.h
 
 SOURCES += \
     fullscreen/mainwindow.cpp \
@@ -20,13 +21,15 @@ SOURCES += \
     fullsub/treelayerview.cpp \
     fullsub/logtextedit.cpp \
     fullsub/notepadtab.cpp \
-    fullsub/searchdialog.cpp
+    fullsub/searchdialog.cpp \
+    fullsub/gotolinedialog.cpp
 
 INCLUDEPATH += qscitinlla
 LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5d
 
 FORMS += \
-    fullsub/searchdialog.ui
+    fullsub/searchdialog.ui \
+    fullsub/gotolinedialog.ui
 
 RESOURCES += \
     gml_ide.qrc

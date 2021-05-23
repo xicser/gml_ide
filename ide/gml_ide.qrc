@@ -40,5 +40,6 @@
         <file>resource/uppercase.png</file>
         <file>resource/zoomin.png</file>
         <file>resource/zoomout.png</file>
+        <file>resource/gotoline.png</file>
     </qresource>
 </RCC>

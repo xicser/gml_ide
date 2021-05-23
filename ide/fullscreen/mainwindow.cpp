@@ -61,6 +61,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::init()
 {
     searchDialog = nullptr;
+    gotolineDialog = nullptr;
     tabInfoList.clear();
     enCoding = "utf-8";
     this->font.setFamily("Courier New");
@@ -268,12 +269,13 @@ void MainWindow::setupEditMenu()
     editMenu->addSeparator();
 
     //转到行
-    gotoLineAct = new QAction(tr("Goto Line..."), this);
+    gotoLineAct = new QAction(QIcon(tr(":/resource/gotoline.png")), tr("Goto Line"), this);
     gotoLineAct->setShortcut(Qt::CTRL + Qt::Key_G);
     editMenu->addAction(gotoLineAct);
+    topToolBar->addAction(gotoLineAct);
 
     //查找
-    findAct = new QAction(QIcon(tr(":/resource/editfind.png")), tr("&Find & Replace"),
+    findAct = new QAction(QIcon(tr(":/resource/editfind.png")), tr("Find/Replace"),
                           this);
     findAct->setShortcut(QKeySequence::Find);
     editMenu->addAction(findAct);
@@ -409,7 +411,7 @@ void MainWindow::setupEditActions()
     connect(upperCaseAct, &QAction::triggered, this, &MainWindow::slotToUpperCase);
     connect(lowerCaseAct, &QAction::triggered, this, &MainWindow::slotToLowerCase);
     connect(findAct, &QAction::triggered, this, &MainWindow::slotSearchAndReplace);
-//    connect(gotoLineAct,SIGNAL(triggered()),this,SLOT(gotoLine()));
+    connect(gotoLineAct, &QAction::triggered, this, &MainWindow::slotGotoLine);
 }
 
 /* 格式菜单Action设置 */
@@ -959,7 +961,7 @@ void MainWindow::slotToLowerCase()
     notePadTabActive->replaceSelectedText(selectedStr);
 }
 
-/* 查找 */
+/* 查找和替换 */
 void MainWindow::slotSearchAndReplace()
 {
     //根本没有打开的子窗体, 直接返回
@@ -978,9 +980,25 @@ void MainWindow::slotSearchAndReplace()
 }
 
 /* 转到行 */
-void MainWindow::slotJumpLine()
+void MainWindow::slotGotoLine()
 {
+    //根本没有打开的子窗体, 直接返回
+    if (tabInfoList.isEmpty() == true) {
+        return;
+    }
 
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+    if (gotolineDialog != nullptr) {
+        delete gotolineDialog;
+        gotolineDialog = nullptr;
+    }
+    gotolineDialog = new GotolineDialog(notePadTabActive);
+    gotolineDialog->show();
+    connect(gotolineDialog, &GotolineDialog::signalGoToLineDone, [=]() {
+        delete gotolineDialog;
+        gotolineDialog = nullptr;
+    });
 }
 
 /* 字体选择 */

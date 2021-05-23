@@ -2,29 +2,29 @@
 #define GOTOLINEDIALOG_H
 
 #include <QWidget>
+#include "fullsub/notepadtab.h"
 
-namespace Ui
-{
-class GoToLineDialog;
+namespace Ui {
+class GotolineDialog;
 }
 
-class GoToLineDialog: public QWidget
+class GotolineDialog : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit GoToLineDialog(QWidget *parent = 0);
-    void setMaxLineNumber(int lineNumber);  //设置行号最大范围
-    ~GoToLineDialog();
-
-signals:
-    void gotoLine(int lineNumber);  //转到行
-
-private slots:
-    void gotoLine();    //用于emit gotoLine
+    GotolineDialog(NotePadTab *notePadTabActive);
+    ~GotolineDialog();
 
 private:
-    Ui::GoToLineDialog *ui;
+    Ui::GotolineDialog *ui;
+    NotePadTab *notePadTabActive;
+
+signals:
+    void signalGoToLineDone();              //跳转执行结束信号
+
+private slots:
+    void slotGoBtnClicked();                //go按钮按下
 };
 
 #endif // GOTOLINEDIALOG_H

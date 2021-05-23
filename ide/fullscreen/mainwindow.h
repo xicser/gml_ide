@@ -11,6 +11,7 @@
 #include "fullsub/logtextedit.h"
 #include "fullsub/notepadtab.h"
 #include "fullsub/searchdialog.h"
+#include "fullsub/gotolinedialog.h"
 
 
 class MainWindow: public QMainWindow
@@ -95,7 +96,8 @@ private:
     void setupWindowActions();                  //窗口菜单Action设置
     void setupHelpActions();                    //帮助菜单Action设置
 
-    SearchDialog *searchDialog;                 //查找子窗口
+    SearchDialog *searchDialog;                 //查找/替换子窗口
+    GotolineDialog *gotolineDialog;             //跳转到行子窗口
 
     //每个tab的信息
     typedef struct {
@@ -129,8 +131,8 @@ private slots:
     void slotSelectAll();                       //全选
     void slotToUpperCase();                     //转为大写
     void slotToLowerCase();                     //转为小写
-    void slotSearchAndReplace();                //查找
-    void slotJumpLine();                        //转到行
+    void slotSearchAndReplace();                //查找和替换
+    void slotGotoLine();                        //转到行
 
     void slotFontSelection();                   //字体选择
     void slotEncodingUTF8();                    //选择uft-8编码
