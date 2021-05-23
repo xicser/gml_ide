@@ -1,4 +1,4 @@
-QT       += core gui printsupport
+QT       += core gui sql printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,7 +13,8 @@ HEADERS += \
     fullsub/logtextedit.h \
     fullsub/notepadtab.h \
     fullsub/searchdialog.h \
-    fullsub/gotolinedialog.h
+    fullsub/gotolinedialog.h \
+    database/gmldatabase.h
 
 SOURCES += \
     fullscreen/mainwindow.cpp \
@@ -22,7 +23,8 @@ SOURCES += \
     fullsub/logtextedit.cpp \
     fullsub/notepadtab.cpp \
     fullsub/searchdialog.cpp \
-    fullsub/gotolinedialog.cpp
+    fullsub/gotolinedialog.cpp \
+    database/gmldatabase.cpp
 
 INCLUDEPATH += qscitinlla
 LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5d

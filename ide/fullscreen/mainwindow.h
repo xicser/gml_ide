@@ -7,6 +7,9 @@
 #include <QTabWidget>
 #include <QStatusBar>
 #include <QCloseEvent>
+
+#include "database/gmldatabase.h"
+
 #include "fullsub/treelayerview.h"
 #include "fullsub/logtextedit.h"
 #include "fullsub/notepadtab.h"
@@ -109,6 +112,7 @@ private:
     QString enCoding;                           //编码格式(目前支持uft-8和gb2312)
     QFont   font;                               //显示字体
     QActionGroup *currentWindowsActionGrp;      //Window Menu中Current Windows子Menu里的Action组
+    GmlDataBase  *gmlDataBase;                  //存放配置信息等的数据库
 
 private slots:
     void slotFileOpen();                        //打开文件
@@ -142,7 +146,7 @@ private slots:
     void slotNextTab();                         //上一个tab
     void slotPrevTab();                         //下一个tab
     void slotCurrentWindows();                  //CurrentWindows
-
+    void slotRecentFiles();                     //最近打开文件
 
     void slotAbout();                           //关于本软件
 

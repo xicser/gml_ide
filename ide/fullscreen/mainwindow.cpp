@@ -45,7 +45,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete searchDialog;
+    if (gotolineDialog != nullptr) {
+        delete gotolineDialog;
+    }
+    if (searchDialog != nullptr) {
+        delete searchDialog;
+    }
+    if (gmlDataBase != nullptr) {
+        delete gmlDataBase;
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -59,6 +67,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //初始化
 void MainWindow::init()
 {
+    gmlDataBase = nullptr;
+    gmlDataBase = new GmlDataBase();
     searchDialog = nullptr;
     gotolineDialog = nullptr;
     tabInfoList.clear();
@@ -436,7 +446,7 @@ void MainWindow::setupWindowActions()
     connect(nextAct, &QAction::triggered, this, &MainWindow::slotNextTab);
     connect(previousAct, &QAction::triggered, this, &MainWindow::slotPrevTab);
     connect(currentWindowsMenu, &QMenu::aboutToShow, this, &MainWindow::slotCurrentWindows);
-//    connect(recentlyFilesMenu, SIGNAL(aboutToShow()), SLOT(updateRecentFiles()));
+    connect(recentlyFilesMenu, &QMenu::aboutToShow, this, &MainWindow::slotRecentFiles);
 }
 
 //帮助Action设置
@@ -1099,6 +1109,17 @@ void MainWindow::slotCurrentWindows()
         NotePadTab *notePadTab = var.value<NotePadTab *>();
         tabWidget->setCurrentWidget(notePadTab);
     });
+}
+
+/* 最近打开文件 */
+void MainWindow::slotRecentFiles()
+{
+    QStringList *recentFilePathList = gmlDataBase->readRencentFileList();
+    if (recentFilePathList->isEmpty() == true) {
+        return;
+    }
+
+
 }
 
 //关于本软件
