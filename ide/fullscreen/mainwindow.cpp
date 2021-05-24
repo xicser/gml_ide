@@ -1,11 +1,7 @@
 #include "mainwindow.h"
-#include <QPrintDialog>
 #include <QColorDialog>
 #include <QFontDialog>
-#include <QPrintEngine>
 #include <QTextStream>
-#include <QPrinter>
-#include <QPrintPreviewDialog>
 #include <QTabWidget>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -94,16 +90,16 @@ void MainWindow::init()
     addToolBarBreak(Qt::TopToolBarArea);
     addToolBar(buildToolBar);
 
-    //左侧树停靠结构
-    treeDirDock = new QDockWidget("files", this);
-    treeDirDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-    treeDirDock->setAllowedAreas(Qt::AllDockWidgetAreas);
-    treeDirView = new TreeLayerView(treeDirDock);
-    treeDirDock->setWidget(treeDirView);
-    this->addDockWidget(Qt::LeftDockWidgetArea, treeDirDock);
+    //左侧项目树停靠结构
+    projViewDock = new QDockWidget("Files", this);
+    projViewDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
+    projViewDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+    projView = new ProjView(projViewDock);
+    projViewDock->setWidget(projView);
+    this->addDockWidget(Qt::LeftDockWidgetArea, projViewDock);
 
     //log输出框停靠结构
-    logDock = new QDockWidget("output", this);
+    logDock = new QDockWidget("Output", this);
     logDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     logDock->setAllowedAreas(Qt::AllDockWidgetAreas);
     logTextEdit = new LogTextEdit(logDock);
@@ -134,14 +130,32 @@ void MainWindow::setupFileMenu()
 {
     fileMenu = new QMenu("&File", menuBar);
 
+    //新建工程
+    newProjAct = new QAction(QIcon(":/resource/filenew.png"), "&Create Project", this);
+    fileMenu->addAction(newProjAct);
+    topToolBar->addAction(newProjAct);
+
+    //打开工程
+    openProjAct = new QAction(QIcon(":/resource/filenew.png"), "&Open Project", this);
+    fileMenu->addAction(openProjAct);
+    topToolBar->addAction(openProjAct);
+
+    //关闭工程
+    closeProjAct = new QAction(QIcon(":/resource/filenew.png"), "&Close Project", this);
+    fileMenu->addAction(closeProjAct);
+    topToolBar->addAction(closeProjAct);
+    topToolBar->addSeparator();
+
+    fileMenu->addSeparator();
+
     //打开文件
-    openAct = new QAction(QIcon(":/resource/fileopen.png"), "&Open", this);
+    openAct = new QAction(QIcon(":/resource/fileopen.png"), "&Open Files", this);
     openAct->setShortcut(QKeySequence::Open);
     fileMenu->addAction(openAct);
     topToolBar->addAction(openAct);
 
     //新建文件
-    newAct = new QAction(QIcon(":/resource/filenew.png"), "&New", this);
+    newAct = new QAction(QIcon(":/resource/filenew.png"), "&New File", this);
     newAct->setShortcut(QKeySequence::New);
     fileMenu->addAction(newAct);
     topToolBar->addAction(newAct);
@@ -363,6 +377,9 @@ void MainWindow::setupHelpMenu()
 /* 文件菜单Action设置 */
 void MainWindow::setupFileActions()
 {
+    connect(newProjAct, &QAction::triggered, this, &MainWindow::slotCreateProject);
+    connect(openProjAct, &QAction::triggered, this, &MainWindow::slotOpenProject);
+    connect(closeProjAct, &QAction::triggered, this, &MainWindow::slotCloseProject);
     connect(openAct, &QAction::triggered, this, &MainWindow::slotFileOpen);
     connect(newAct, &QAction::triggered, this, &MainWindow::slotFileNew);
     connect(saveAct, &QAction::triggered, this, &MainWindow::slotFileSave);
@@ -488,6 +505,33 @@ void MainWindow::openFileWithFilePath(QString filepath)
     tabInfo.notePadTab->setFocus();
 }
 
+/* 创建工程 */
+void MainWindow::slotCreateProject()
+{
+    //从用户那里获取工程名, 路径
+    //TODO
+
+    projView->createProjFile(QString("./first.gpro"));
+}
+
+/* 打开工程 */
+void MainWindow::slotOpenProject()
+{
+    QString gproPath = QFileDialog::getOpenFileName(this, "Select project...", ".",
+             "gml project(*.gpro);;all(*.*)");
+
+    if (gproPath.isEmpty() == false) {
+        projView->openProjFile(gproPath);
+    }
+}
+
+/* 关闭工程 */
+void MainWindow::slotCloseProject()
+{
+    qDebug() << "关闭工程";
+    projView->closeProjFile();
+}
+
 /* 打开文件 */
 void MainWindow::slotFileOpen()
 {
@@ -519,6 +563,21 @@ void MainWindow::slotFileNew()
     //聚焦到刚刚新建的文件tab上
     this->tabWidget->setCurrentWidget(tabInfo.notePadTab);
     tabInfo.notePadTab->setFocus();
+
+    //如果当前有打开的工程, 则提示是否添加到工程中
+    //TODO
+    QMessageBox::StandardButton ret = QMessageBox::information(this, "Info", "Do you want to add this new file to the current project ?",
+                                                                QMessageBox::Yes | QMessageBox::No);
+    switch (ret) {
+    case QMessageBox::Yes:
+        slotFileSave();
+        projView->appendGmlFile(tabInfo.notePadTab->getFilePath());
+        break;
+    case QMessageBox::No:
+        break;
+    default:
+        break;
+    }
 }
 
 /* 保存文件 */
@@ -683,30 +742,6 @@ void MainWindow::slotFileSaveAll()
         this->tabWidget->setCurrentWidget(tabInfoList[i].notePadTab);
         slotFileSave();
     }
-}
-
-/* 打印文件 */
-void MainWindow::slotFilePrint()
-{
-
-}
-
-/* 打印预览 */
-void MainWindow::slotFilePrintPreview()
-{
-
-}
-
-/* 输出成PDF */
-void MainWindow::slotFilePrintPdf()
-{
-
-}
-
-/* 打印预览子函数 */
-void MainWindow::slotPrintPreview(QPrinter *)
-{
-
 }
 
 /* 关闭文件 */

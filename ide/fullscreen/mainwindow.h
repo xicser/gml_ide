@@ -3,14 +3,13 @@
 
 #include <QObject>
 #include <QMainWindow>
-#include <QPrinter>
 #include <QTabWidget>
 #include <QStatusBar>
 #include <QCloseEvent>
 
 #include "database/gmldatabase.h"
 
-#include "fullsub/treelayerview.h"
+#include "fullsub/projview.h"
 #include "fullsub/logtextedit.h"
 #include "fullsub/notepadtab.h"
 #include "fullsub/searchdialog.h"
@@ -36,6 +35,9 @@ private:
     QMenu   *fileMenu;                          //文件菜单
     QAction *openAct;                           //打开文件
     QAction *newAct;                            //新建文件
+    QAction *newProjAct;                        //新建工程
+    QAction *openProjAct;                       //打开工程
+    QAction *closeProjAct;                      //关闭工程
     QAction *saveAct;                           //保存文件
     QAction *saveAsAct;                         //文件另存为
     QAction *saveAllAct;                        //保存所有
@@ -77,8 +79,8 @@ private:
     QMenu   *helpMenu;                          //帮助菜单
     QAction *aboutAct;                          //关于本软件
 
-    QDockWidget   *treeDirDock;                 //树文件目录停靠
-    TreeLayerView *treeDirView;                 //树文件目录结构
+    QDockWidget   *projViewDock;                //工程树结构停靠
+    ProjView      *projView;                    //工程树结构
     QDockWidget   *logDock;                     //log输出停靠
     LogTextEdit   *logTextEdit;                 //log输出文本框
     QTabWidget    *tabWidget;                   //文本Tab标签页
@@ -116,15 +118,14 @@ private:
     void openFileWithFilePath(QString filepath);  //根据文件路径打开文件
 
 private slots:
+    void slotCreateProject();                   //创建工程
+    void slotOpenProject();                     //打开工程
+    void slotCloseProject();                    //关闭工程
     void slotFileOpen();                        //打开文件
     void slotFileNew();                         //新建文件
     void slotFileSave();                        //保存文件
     void slotFileSaveAs();                      //文件另存为
     void slotFileSaveAll();                     //保存所有文件
-    void slotFilePrint();                       //打印文件
-    void slotFilePrintPreview();                //打印预览
-    void slotFilePrintPdf();                    //输出成PDF
-    void slotPrintPreview(QPrinter *);          //打印预览子函数
     void slotFileClose();                       //关闭文件
     bool slotFileCloseAll();                    //关闭所有文件
     void slotCloseWindow();                     //关闭窗口

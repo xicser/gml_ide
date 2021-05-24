@@ -1,4 +1,4 @@
-QT       += core gui sql printsupport
+QT       += core gui sql xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -9,22 +9,22 @@ DEFINES += QSCINTILLA_DLL
 
 HEADERS += \
     fullscreen/mainwindow.h \
-    fullsub/treelayerview.h \
     fullsub/logtextedit.h \
     fullsub/notepadtab.h \
     fullsub/searchdialog.h \
     fullsub/gotolinedialog.h \
-    database/gmldatabase.h
+    database/gmldatabase.h \
+    fullsub/projview.h
 
 SOURCES += \
     fullscreen/mainwindow.cpp \
     main.cpp \
-    fullsub/treelayerview.cpp \
     fullsub/logtextedit.cpp \
     fullsub/notepadtab.cpp \
     fullsub/searchdialog.cpp \
     fullsub/gotolinedialog.cpp \
-    database/gmldatabase.cpp
+    database/gmldatabase.cpp \
+    fullsub/projview.cpp
 
 INCLUDEPATH += qscitinlla
 LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5d
