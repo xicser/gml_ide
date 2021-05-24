@@ -39,9 +39,6 @@ private:
     QAction *saveAct;                           //保存文件
     QAction *saveAsAct;                         //文件另存为
     QAction *saveAllAct;                        //保存所有
-    QAction *printAct;                          //打印
-    QAction *printPreviewAct;                   //打印预览
-    QAction *exportPdfAct;                      //导出成PDF
     QAction *closeAct;                          //关闭文件
     QAction *closeAllAct;                       //关闭所有文件
     QAction *exitAct;                           //退出

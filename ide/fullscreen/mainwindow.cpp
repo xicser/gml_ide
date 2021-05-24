@@ -169,25 +169,6 @@ void MainWindow::setupFileMenu()
 
     fileMenu->addSeparator();
 
-    //打印
-    printAct = new QAction(QIcon(":/resource/fileprint.png"), "Print", this);
-    printAct->setShortcut(QKeySequence::Print);
-    fileMenu->addAction(printAct);
-    topToolBar->addAction(printAct);
-
-    //打印预览
-    printPreviewAct = new QAction(QIcon(":/resource/printpreview.png"), "Print Pre&view", this);
-    fileMenu->addAction(printPreviewAct);
-    topToolBar->addAction(printPreviewAct);
-
-    //导出成PDF
-    exportPdfAct = new QAction(QIcon(":/resource/exportpdf.png"), "Export Pdf", this);
-    fileMenu->addAction(exportPdfAct);
-    topToolBar->addAction(exportPdfAct);
-    topToolBar->addSeparator();
-
-    fileMenu->addSeparator();
-
     //关闭当前文件
     closeAct = new QAction(QIcon(":/resource/fileclose.png"), "Close", this);
     closeAct->setShortcut(QKeySequence::Close);
@@ -387,12 +368,6 @@ void MainWindow::setupFileActions()
     connect(saveAct, &QAction::triggered, this, &MainWindow::slotFileSave);
     connect(saveAsAct, &QAction::triggered, this, &MainWindow::slotFileSaveAs);
     connect(saveAllAct, &QAction::triggered, this, &MainWindow::slotFileSaveAll);
-//#ifndef QT_NO_PRINTER
-//    connect(printAct, SIGNAL(triggered()), this, SLOT(filePrint()));
-//    connect(printPreviewAct, SIGNAL(triggered()), this,
-//            SLOT(filePrintPreview()));
-//    connect(exportPdfAct, SIGNAL(triggered()), this, SLOT(filePrintPdf()));
-//#endif
     connect(closeAct, &QAction::triggered, this, &MainWindow::slotFileClose);
     connect(closeAllAct, &QAction::triggered, this, &MainWindow::slotFileCloseAll);
     connect(exitAct, &QAction::triggered, this, &MainWindow::slotCloseWindow);
