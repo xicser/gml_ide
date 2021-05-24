@@ -516,9 +516,12 @@ void MainWindow::openFileWithFilePath(QString filepath)
 /* 打开文件 */
 void MainWindow::slotFileOpen()
 {
-    QString filepath = QFileDialog::getOpenFileName(this, "Select files...", ".",
+    QStringList filepaths = QFileDialog::getOpenFileNames(this, "Select files...", ".",
              "gml source(*.gml);;all(*.*)");
-    openFileWithFilePath(filepath);
+
+    for (int i = 0; i < filepaths.size(); i++) {
+        openFileWithFilePath(filepaths[i]);
+    }
 }
 
 /* 新建文件 */
@@ -1170,9 +1173,8 @@ void MainWindow::slotClearRecentFiles()
 /* 关于本软件 */
 void MainWindow::slotAbout()
 {
-    QMessageBox::about(this, "About", "This example demonstrates Qt's "
-                                      "rich text editing facilities in action, providing an example "
-                                      "document for you to experiment with.");
+    QMessageBox::about(this, "About", "This software is used to compile UAV cluster description language GML, "
+                                      "all rights reserved by Northwestern Polytechnical University");
 }
 
 /* tab请求关闭 */
