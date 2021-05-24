@@ -95,7 +95,7 @@ void MainWindow::init()
     addToolBar(buildToolBar);
 
     //左侧树停靠结构
-    treeDirDock = new QDockWidget(tr("files"), this);
+    treeDirDock = new QDockWidget("files", this);
     treeDirDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     treeDirDock->setAllowedAreas(Qt::AllDockWidgetAreas);
     treeDirView = new TreeLayerView(treeDirDock);
@@ -103,7 +103,7 @@ void MainWindow::init()
     this->addDockWidget(Qt::LeftDockWidgetArea, treeDirDock);
 
     //log输出框停靠结构
-    logDock = new QDockWidget(tr("output"), this);
+    logDock = new QDockWidget("output", this);
     logDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     logDock->setAllowedAreas(Qt::AllDockWidgetAreas);
     logTextEdit = new LogTextEdit(logDock);
@@ -132,16 +132,16 @@ void MainWindow::init()
 /* 文件菜单功能实现 */
 void MainWindow::setupFileMenu()
 {
-    fileMenu = new QMenu(tr("&File"), menuBar);
+    fileMenu = new QMenu("&File", menuBar);
 
     //打开文件
-    openAct = new QAction(QIcon(tr(":/resource/fileopen.png")), tr("&Open"), this);
+    openAct = new QAction(QIcon(":/resource/fileopen.png"), "&Open", this);
     openAct->setShortcut(QKeySequence::Open);
     fileMenu->addAction(openAct);
     topToolBar->addAction(openAct);
 
     //新建文件
-    newAct = new QAction(QIcon(tr(":/resource/filenew.png")), tr("&New"), this);
+    newAct = new QAction(QIcon(":/resource/filenew.png"), "&New", this);
     newAct->setShortcut(QKeySequence::New);
     fileMenu->addAction(newAct);
     topToolBar->addAction(newAct);
@@ -149,21 +149,19 @@ void MainWindow::setupFileMenu()
     fileMenu->addSeparator();
 
     //保存文件
-    saveAct = new QAction(QIcon(tr(":/resource/filesave.png")), tr("&Save"), this);
+    saveAct = new QAction(QIcon(":/resource/filesave.png"), "&Save", this);
     saveAct->setShortcut(QKeySequence::Save);
     fileMenu->addAction(saveAct);
     topToolBar->addAction(saveAct);
 
     //文件另存为
-    saveAsAct = new QAction(QIcon(tr(":/resource/filesaveas.png")),
-                            tr("Save &As..."), this);
+    saveAsAct = new QAction(QIcon(":/resource/filesaveas.png"), "Save &As...", this);
     saveAsAct->setShortcut(QKeySequence::SaveAs);
     fileMenu->addAction(saveAsAct);
     topToolBar->addAction(saveAsAct);
 
     //保存所有
-    saveAllAct = new QAction(QIcon(tr(":/resource/saveall.png")), tr("Save All"),
-                             this);
+    saveAllAct = new QAction(QIcon(":/resource/saveall.png"), "Save All", this);
     saveAllAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     fileMenu->addAction(saveAllAct);
     topToolBar->addAction(saveAllAct);
@@ -172,21 +170,18 @@ void MainWindow::setupFileMenu()
     fileMenu->addSeparator();
 
     //打印
-    printAct = new QAction(QIcon(tr(":/resource/fileprint.png")), tr("Print"),
-                           this);
+    printAct = new QAction(QIcon(":/resource/fileprint.png"), "Print", this);
     printAct->setShortcut(QKeySequence::Print);
     fileMenu->addAction(printAct);
     topToolBar->addAction(printAct);
 
     //打印预览
-    printPreviewAct = new QAction(QIcon(tr(":/resource/printpreview.png")),
-                                  tr("Print Pre&view"), this);
+    printPreviewAct = new QAction(QIcon(":/resource/printpreview.png"), "Print Pre&view", this);
     fileMenu->addAction(printPreviewAct);
     topToolBar->addAction(printPreviewAct);
 
     //导出成PDF
-    exportPdfAct = new QAction(QIcon(tr(":/resource/exportpdf.png")),
-                               tr("Export Pdf"), this);
+    exportPdfAct = new QAction(QIcon(":/resource/exportpdf.png"), "Export Pdf", this);
     fileMenu->addAction(exportPdfAct);
     topToolBar->addAction(exportPdfAct);
     topToolBar->addSeparator();
@@ -194,21 +189,19 @@ void MainWindow::setupFileMenu()
     fileMenu->addSeparator();
 
     //关闭当前文件
-    closeAct = new QAction(QIcon(tr(":/resource/fileclose.png")), tr("Close"),
-                           this);
+    closeAct = new QAction(QIcon(":/resource/fileclose.png"), "Close", this);
     closeAct->setShortcut(QKeySequence::Close);
     fileMenu->addAction(closeAct);
     topToolBar->addAction(closeAct);
 
     //关闭所有文件
-    closeAllAct = new QAction(QIcon(tr(":/resource/closeall.png")),
-                              tr("Close All"), this);
+    closeAllAct = new QAction(QIcon(":/resource/closeall.png"), "Close All", this);
     closeAllAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_X);
     fileMenu->addAction(closeAllAct);
     topToolBar->addAction(closeAllAct);
 
     //退出
-    exitAct = new QAction(QIcon(tr(":/resource/fileexit.png")), tr("Exit"), this);
+    exitAct = new QAction(QIcon(":/resource/fileexit.png"), "Exit", this);
     exitAct->setShortcut(QKeySequence::Quit);
     fileMenu->addAction(exitAct);
     topToolBar->addAction(exitAct);
@@ -220,22 +213,22 @@ void MainWindow::setupFileMenu()
 /* 编辑菜单功能实现 */
 void MainWindow::setupEditMenu()
 {
-    editMenu = new QMenu(tr("&Edit"), menuBar);
+    editMenu = new QMenu("&Edit", menuBar);
 
     //复制
-    copyAct = new QAction(QIcon(tr(":/resource/editcopy.png")), tr("&Copy"), this);
+    copyAct = new QAction(QIcon(":/resource/editcopy.png"), "&Copy", this);
     copyAct->setShortcut(QKeySequence::Copy);
     editMenu->addAction(copyAct);
     topToolBar->addAction(copyAct);
 
     //剪切
-    cutAct = new QAction(QIcon(tr(":/resource/editcut.png")), tr("&Cut"), this);
+    cutAct = new QAction(QIcon(":/resource/editcut.png"), "&Cut", this);
     cutAct->setShortcut(QKeySequence::Cut);
     editMenu->addAction(cutAct);
     topToolBar->addAction(cutAct);
 
     //粘贴
-    pasteAct = new QAction(QIcon(tr(":/resource/editpaste.png")), tr("&Paste"), this);
+    pasteAct = new QAction(QIcon(":/resource/editpaste.png"), "&Paste", this);
     pasteAct->setShortcut(QKeySequence::Paste);
     editMenu->addAction(pasteAct);
     topToolBar->addAction(pasteAct);
@@ -243,13 +236,13 @@ void MainWindow::setupEditMenu()
     editMenu->addSeparator();
 
     //撤销
-    undoAct = new QAction(QIcon(tr(":/resource/editundo.png")), tr("&Undo"), this);
+    undoAct = new QAction(QIcon(":/resource/editundo.png"), "&Undo", this);
     undoAct->setShortcut(QKeySequence::Undo);
     editMenu->addAction(undoAct);
     topToolBar->addAction(undoAct);
 
     //重做
-    redoAct = new QAction(QIcon(tr(":/resource/editredo.png")), tr("&Redo"), this);
+    redoAct = new QAction(QIcon(":/resource/editredo.png"), "&Redo", this);
     redoAct->setShortcut(QKeySequence::Redo);
     editMenu->addAction(redoAct);
     topToolBar->addAction(redoAct);
@@ -257,35 +250,31 @@ void MainWindow::setupEditMenu()
     editMenu->addSeparator();
 
     //全选
-    selectAllAct = new QAction(QIcon(tr(":/resource/editselectall.png")),
-                               tr("&Select all"), this);
+    selectAllAct = new QAction(QIcon(":/resource/editselectall.png"), "&Select all", this);
     selectAllAct->setShortcut(QKeySequence::SelectAll);
     editMenu->addAction(selectAllAct);
     topToolBar->addAction(selectAllAct);
 
     //转为大写
-    upperCaseAct = new QAction(QIcon(tr(":/resource/uppercase.png")), tr("UpperCase"),
-                               this);
+    upperCaseAct = new QAction(QIcon(":/resource/uppercase.png"), "UpperCase", this);
     editMenu->addAction(upperCaseAct);
     topToolBar->addAction(upperCaseAct);
 
     //转为小写
-    lowerCaseAct = new QAction(QIcon(tr(":/resource/lowercase.png")), tr("LowerCase"),
-                               this);
+    lowerCaseAct = new QAction(QIcon(":/resource/lowercase.png"), "LowerCase", this);
     editMenu->addAction(lowerCaseAct);
     topToolBar->addAction(lowerCaseAct);
 
     editMenu->addSeparator();
 
     //转到行
-    gotoLineAct = new QAction(QIcon(tr(":/resource/gotoline.png")), tr("Goto Line"), this);
+    gotoLineAct = new QAction(QIcon(":/resource/gotoline.png"), "Goto Line", this);
     gotoLineAct->setShortcut(Qt::CTRL + Qt::Key_G);
     editMenu->addAction(gotoLineAct);
     topToolBar->addAction(gotoLineAct);
 
     //查找
-    findAct = new QAction(QIcon(tr(":/resource/editfind.png")), tr("Find/Replace"),
-                          this);
+    findAct = new QAction(QIcon(":/resource/editfind.png"), "Find/Replace", this);
     findAct->setShortcut(QKeySequence::Find);
     editMenu->addAction(findAct);
     topToolBar->addAction(findAct);
@@ -298,21 +287,21 @@ void MainWindow::setupEditMenu()
 /* 格式菜单功能实现 */
 void MainWindow::setupFormatMenu()
 {
-    formatMenu = new QMenu(tr("&Format"), menuBar);
-    enCodingMenu = new QMenu(tr("Encoding"), formatMenu);
+    formatMenu = new QMenu("&Format", menuBar);
+    enCodingMenu = new QMenu("Encoding", formatMenu);
 
     //字体
-    fontAct = new QAction(QIcon(tr(":/resource/textfont.png")), tr("Font"), formatMenu);
+    fontAct = new QAction(QIcon(":/resource/textfont.png"), "Font", formatMenu);
     topToolBar->addAction(fontAct);
     topToolBar->addSeparator();
 
     //UTF-8
-    enCodingUTF8Act = new QAction(tr("UTF-8"), enCodingMenu);
+    enCodingUTF8Act = new QAction("UTF-8", enCodingMenu);
     enCodingUTF8Act->setCheckable(true);
     enCodingUTF8Act->setChecked(true);
 
     //GB2312
-    enCodingGB2312Act = new QAction(tr("GB2312"), enCodingMenu);
+    enCodingGB2312Act = new QAction("GB2312", enCodingMenu);
     enCodingGB2312Act->setCheckable(true);
     enCodingGB2312Act->setChecked(false);
 
@@ -328,21 +317,21 @@ void MainWindow::setupFormatMenu()
 /* 构建菜单功能实现 */
 void MainWindow::setupBuildMenu()
 {
-    buildMenu = new QMenu(tr("&Build"), menuBar);
+    buildMenu = new QMenu("&Build", menuBar);
     menuBar->addMenu(buildMenu);
 
     //编译
-    compileAct = new QAction(QIcon(tr(":/resource/compile.png")), tr("&Compile"), this);
+    compileAct = new QAction(QIcon(":/resource/compile.png"), "&Compile", this);
     buildMenu->addAction(compileAct);
     buildToolBar->addAction(compileAct);
 
     //部署
-    deployAct = new QAction(QIcon(tr(":/resource/deploy.png")), tr("&Deploy"), this);
+    deployAct = new QAction(QIcon(":/resource/deploy.png"), "&Deploy", this);
     buildMenu->addAction(deployAct);
     buildToolBar->addAction(deployAct);
 
     //运行
-    runAct = new QAction(QIcon(tr(":/resource/run.png")), tr("&Run"), this);
+    runAct = new QAction(QIcon(":/resource/run.png"), "&Run", this);
     buildMenu->addAction(runAct);
     buildToolBar->addAction(runAct);
 }
@@ -350,29 +339,28 @@ void MainWindow::setupBuildMenu()
 /* 窗口菜单功能实现 */
 void MainWindow::setupWindowMenu()
 {
-    windowMenu = new QMenu(tr("&Window"), menuBar);
+    windowMenu = new QMenu("&Window", menuBar);
 
     //上一个窗口
-    previousAct = new QAction(QIcon(tr(":/resource/previous.png")),
-                              tr("Previous Window"), windowMenu);
+    previousAct = new QAction(QIcon(":/resource/previous.png"), "Previous Window", windowMenu);
     previousAct->setShortcut(Qt::CTRL + Qt::Key_Left);
     windowMenu->addAction(previousAct);
     topToolBar->addAction(previousAct);
 
     //下一个窗口
-    nextAct = new QAction(QIcon(tr(":/resource/next.png")), tr("Next Window"), windowMenu);
+    nextAct = new QAction(QIcon(":/resource/next.png"), "Next Window", windowMenu);
     nextAct->setShortcut(Qt::CTRL + Qt::Key_Right);
     windowMenu->addAction(nextAct);
     topToolBar->addAction(nextAct);
 
     //最近使用过的文件窗口
-    recentlyFilesMenu = new QMenu(tr("Recently Files"), windowMenu);
+    recentlyFilesMenu = new QMenu("Recently Files", windowMenu);
     windowMenu->addMenu(recentlyFilesMenu);
-    clearRecentlyAct = new QAction(tr("Clear History"), recentlyFilesMenu);
+    clearRecentlyAct = new QAction("Clear History", recentlyFilesMenu);
     recentlyFilesMenu->addAction(clearRecentlyAct);
 
     //当前所有窗口
-    currentWindowsMenu = new QMenu(tr("Current Windows"), windowMenu);
+    currentWindowsMenu = new QMenu("Current Windows", windowMenu);
     windowMenu->addMenu(currentWindowsMenu);
     topToolBar->addSeparator();
     menuBar->addMenu(windowMenu);
@@ -381,10 +369,10 @@ void MainWindow::setupWindowMenu()
 /* 帮助菜单功能实现 */
 void MainWindow::setupHelpMenu()
 {
-    helpMenu = new QMenu(tr("&Help"), menuBar);
+    helpMenu = new QMenu("&Help", menuBar);
 
     //关于本软件
-    aboutAct = new QAction(QIcon(tr(":/resource/helpabout.png")), tr("About"), this);
+    aboutAct = new QAction(QIcon(":/resource/helpabout.png"), "About", this);
     helpMenu->addAction(aboutAct);
     topToolBar->addAction(aboutAct);
 
@@ -504,7 +492,7 @@ void MainWindow::openFileWithFilePath(QString filepath)
     file.setFileName(filepath);
     bool ret = file.open(QIODevice::ReadOnly | QIODevice::Text);
     if (ret == false) {
-        QMessageBox::warning(this, "错误", "打开出错！");
+        QMessageBox::warning(this, "Error", "Open failed !");
         return;
     }
     QTextStream inStream(&file);
@@ -528,8 +516,8 @@ void MainWindow::openFileWithFilePath(QString filepath)
 /* 打开文件 */
 void MainWindow::slotFileOpen()
 {
-    QString filepath = QFileDialog::getOpenFileName(this, tr("选择文本文件"), ".",
-             "text(*.cpp *.h *.txt);;all(*.*)");
+    QString filepath = QFileDialog::getOpenFileName(this, "Select files...", ".",
+             "gml source(*.gml);;all(*.*)");
     openFileWithFilePath(filepath);
 }
 
@@ -546,7 +534,7 @@ void MainWindow::slotFileNew()
     tabInfo.notePadTab->setFilePath(tabInfo.filePath);
     tabInfoList << tabInfo;
 
-    this->tabWidget->addTab(tabInfo.notePadTab, tr("new *"));
+    this->tabWidget->addTab(tabInfo.notePadTab, "new *");
     connect(tabInfo.notePadTab, &QsciScintilla::textChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
     connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
 
@@ -569,10 +557,10 @@ void MainWindow::slotFileSave()
 
     //为new, 表示是新建的文件
     if (notePadTabActive->getFileName() == "new") {
-        QString tmpStr = "保存";
+        QString tmpStr = "Save ";
         tmpStr.append(notePadTabActive->getFileName());
 
-        QString filepath = QFileDialog::getSaveFileName(this, tmpStr, ".", "text(*.cpp *.h *.txt);;all(*.*)");
+        QString filepath = QFileDialog::getSaveFileName(this, tmpStr, ".", "gml source(*.gml);;all(*.*)");
         if (filepath.isEmpty() == false) {
 
             //保存这个文件路径到最近打开文件列表
@@ -583,7 +571,7 @@ void MainWindow::slotFileSave()
             file.setFileName(filepath);
             bool ret = file.open(QIODevice::WriteOnly | QIODevice::Text);
             if (ret == false) {
-                QMessageBox::warning(this, "错误", "保存出错！");
+                QMessageBox::warning(this, "Error", "Save failed !");
                 return;
             }
             QTextStream stream(&file);
@@ -598,7 +586,7 @@ void MainWindow::slotFileSave()
             file.close();
 
             //提示保存成功
-            QMessageBox::information(this, "提示", "保存成功！");
+            QMessageBox::information(this, "Info", "Save successfully !");
 
             //设置新的title
             QFileInfo info(filepath);
@@ -629,7 +617,7 @@ void MainWindow::slotFileSave()
         file.setFileName(notePadTabActive->getFilePath());
         bool ret = file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
         if (ret == false) {
-            QMessageBox::warning(this, "错误", "保存出错！");
+            QMessageBox::warning(this, "Error", "Save failed !");
             return;
         }
         QTextStream stream(&file);
@@ -661,9 +649,9 @@ void MainWindow::slotFileSaveAs()
     //先获取当前活动的子窗体
     NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
 
-    QString tmpStr = "另存为";
+    QString tmpStr = "Save As ";
     tmpStr = tmpStr.append(notePadTabActive->getFileName());
-    QString filepath = QFileDialog::getSaveFileName(this, tmpStr, ".", "text(*.cpp *.h *.txt);;all(*.*)");
+    QString filepath = QFileDialog::getSaveFileName(this, tmpStr, ".", "gml source(*.gml);;all(*.*)");
     if (filepath.isEmpty() == false) {
 
         //新开一个tab, 显示刚才另存为的文件
@@ -690,7 +678,7 @@ void MainWindow::slotFileSaveAs()
         file.setFileName(filepath);
         bool ret = file.open(QIODevice::WriteOnly | QIODevice::Text);
         if (ret == false) {
-            QMessageBox::warning(this, "错误", "保存出错！");
+            QMessageBox::warning(this, "Error", "Save failed !");
             return;
         }
         QTextStream stream(&file);
@@ -705,7 +693,7 @@ void MainWindow::slotFileSaveAs()
         file.close();
 
         //提示另存为成功
-        QMessageBox::information(this, "提示", "另存为成功！");
+        QMessageBox::information(this, "Info", "Save successfully !");
     }
 }
 
@@ -757,10 +745,10 @@ void MainWindow::slotFileClose()
 
     //如果该窗体正在被编辑, 则要提示是否保存
     if (notePadTabActive->getEditStatus() == true) {
-        QString tmpStr = "是否保存 ";
+        QString tmpStr = "Save ";
         tmpStr.append(notePadTabActive->getFileName());
         tmpStr.append(" ?");
-        QMessageBox::StandardButton ret = QMessageBox::information(this, "保存提示", tmpStr,
+        QMessageBox::StandardButton ret = QMessageBox::information(this, "Info", tmpStr,
                                  QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
         switch (ret) {
             case QMessageBox::Yes: {
@@ -820,10 +808,10 @@ bool MainWindow::slotFileCloseAll()
 
         //如果该窗体正在被编辑, 则要提示是否保存
         if (notePadTabActive->getEditStatus() == true) {
-            QString tmpStr = "是否保存 ";
+            QString tmpStr = "Save ";
             tmpStr.append(notePadTabActive->getFileName());
             tmpStr.append(" ?");
-            QMessageBox::StandardButton ret = QMessageBox::information(this, "保存提示", tmpStr,
+            QMessageBox::StandardButton ret = QMessageBox::information(this, "Info", tmpStr,
                                      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
             switch (ret) {
                 case QMessageBox::Yes: {
@@ -1182,9 +1170,9 @@ void MainWindow::slotClearRecentFiles()
 /* 关于本软件 */
 void MainWindow::slotAbout()
 {
-    QMessageBox::about(this, tr("About"), tr("This example demonstrates Qt's "
-                                             "rich text editing facilities in action, providing an example "
-                                             "document for you to experiment with."));
+    QMessageBox::about(this, "About", "This example demonstrates Qt's "
+                                      "rich text editing facilities in action, providing an example "
+                                      "document for you to experiment with.");
 }
 
 /* tab请求关闭 */
