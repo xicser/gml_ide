@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setupBuildMenu();
     setupWindowMenu();
     setupHelpMenu();
+    setupProjTree();
 
     setupFileActions();
     setupEditActions();
@@ -37,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setupBuildActions();
     setupWindowActions();
     setupHelpActions();
+    setupProjTreeActions();
 }
 
 MainWindow::~MainWindow()
@@ -49,6 +51,9 @@ MainWindow::~MainWindow()
     }
     if (gmlDataBase != nullptr) {
         delete gmlDataBase;
+    }
+    if (createProjectDialog != nullptr) {
+        delete createProjectDialog;
     }
 }
 
@@ -63,10 +68,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
 /* 初始化 */
 void MainWindow::init()
 {
+    hasOpenProj = false;
     gmlDataBase = nullptr;
     gmlDataBase = new GmlDataBase();
     searchDialog = nullptr;
     gotolineDialog = nullptr;
+    createProjectDialog = nullptr;
     tabInfoList.clear();
     enCoding = "utf-8";
     this->font.setFamily("Courier New");
@@ -374,6 +381,21 @@ void MainWindow::setupHelpMenu()
     menuBar->addMenu(helpMenu);
 }
 
+/* 工程栏右键菜单功能实现 */
+void MainWindow::setupProjTree()
+{
+    //右键菜单: 图形
+    menuRightBtnProjTree = new QMenu(this);
+
+    addNewFileAct = new QAction("Add new gml files...", menuRightBtnProjTree);
+    addExistingFileAct = new QAction("Add existing gml files...", menuRightBtnProjTree);
+    menuRightBtnProjTree->addAction(addNewFileAct);
+    menuRightBtnProjTree->addAction(addExistingFileAct);
+    menuRightBtnProjTree->hide();
+
+    this->projView->setMenuRightBtnProjTree(menuRightBtnProjTree);
+}
+
 /* 文件菜单Action设置 */
 void MainWindow::setupFileActions()
 {
@@ -437,6 +459,13 @@ void MainWindow::setupWindowActions()
 void MainWindow::setupHelpActions()
 {
     connect(aboutAct, &QAction::triggered, this, &MainWindow::slotAbout);
+}
+
+/* 工程栏右键菜单Action设置 */
+void MainWindow::setupProjTreeActions()
+{
+    connect(addNewFileAct, &QAction::triggered, this, &MainWindow::slotProjTreeAddNewFileClicked);
+    connect(addExistingFileAct, &QAction::triggered, this, &MainWindow::slotProjTreeAddExistingFileClicked);
 }
 
 /* 根据文件路径打开文件 */
@@ -508,10 +537,25 @@ void MainWindow::openFileWithFilePath(QString filepath)
 /* 创建工程 */
 void MainWindow::slotCreateProject()
 {
-    //从用户那里获取工程名, 路径
-    //TODO
+    //从用户那里获取要创建的工程名, 所在路径
+    if (createProjectDialog != nullptr) {
+        delete createProjectDialog;
+        createProjectDialog = nullptr;
+    }
+    createProjectDialog = new CreateProjectDialog();
+    createProjectDialog->show();
 
-    projView->createProjFile(QString("./first.gpro"));
+    connect(createProjectDialog, &CreateProjectDialog::signalConfirmBtnClicked , [=]() {
+
+        //创建工程
+        bool isSuccess = projView->createProjFile(createProjectDialog->getProjectFilePath() + "/"
+                                 + createProjectDialog->getProjectFileName() + ".gpro");
+        if (isSuccess == true) {
+            this->hasOpenProj = true;
+        } else {
+            this->hasOpenProj = false;
+        }
+    });
 }
 
 /* 打开工程 */
@@ -521,15 +565,20 @@ void MainWindow::slotOpenProject()
              "gml project(*.gpro);;all(*.*)");
 
     if (gproPath.isEmpty() == false) {
-        projView->openProjFile(gproPath);
+        bool isSuccess = projView->openProjFile(gproPath);
+        if (isSuccess == true) {
+            this->hasOpenProj = true;
+        } else {
+            this->hasOpenProj = false;
+        }
     }
 }
 
 /* 关闭工程 */
 void MainWindow::slotCloseProject()
 {
-    qDebug() << "关闭工程";
     projView->closeProjFile();
+    this->hasOpenProj = false;
 }
 
 /* 打开文件 */
@@ -565,18 +614,13 @@ void MainWindow::slotFileNew()
     tabInfo.notePadTab->setFocus();
 
     //如果当前有打开的工程, 则提示是否添加到工程中
-    //TODO
-    QMessageBox::StandardButton ret = QMessageBox::information(this, "Info", "Do you want to add this new file to the current project ?",
-                                                                QMessageBox::Yes | QMessageBox::No);
-    switch (ret) {
-    case QMessageBox::Yes:
-        slotFileSave();
-        projView->appendGmlFile(tabInfo.notePadTab->getFilePath());
-        break;
-    case QMessageBox::No:
-        break;
-    default:
-        break;
+    if (hasOpenProj == true) {
+        QMessageBox::StandardButton ret = QMessageBox::information(this, "Info", "Do you want to add this new file to the current project ?",
+                                                                    QMessageBox::Yes | QMessageBox::No);
+        if (ret == QMessageBox::Yes) {
+            slotFileSave(); //先保存这个文件
+            projView->appendGmlFile(tabInfo.notePadTab->getFilePath());
+        }
     }
 }
 
@@ -1185,6 +1229,18 @@ void MainWindow::slotAbout()
 {
     QMessageBox::about(this, "About", "This software is used to compile UAV cluster description language GML, "
                                       "all rights reserved by Northwestern Polytechnical University");
+}
+
+/* 工程树添加新文件 */
+void MainWindow::slotProjTreeAddNewFileClicked()
+{
+    qDebug() << "新文件";
+}
+
+/* 工程树添加现有文件 */
+void MainWindow::slotProjTreeAddExistingFileClicked()
+{
+    qDebug() << "现有文件";
 }
 
 /* tab请求关闭 */

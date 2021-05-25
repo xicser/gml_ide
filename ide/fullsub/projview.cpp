@@ -10,12 +10,22 @@
 #include <QDateTime>
 #include <QFileInfo>
 
+//树形结构叶子结点
+typedef struct {
+    QString name;
+    QString path;
+} TreeFileNode_t;
+Q_DECLARE_METATYPE(TreeFileNode_t)
 
 ProjView::ProjView(QWidget *parent) : QTreeView(parent)
 {
+    isRightMouseBtnPressed = false;
     modelTree = new QStandardItemModel(this);
     this->setModel(modelTree);
     this->header()->setVisible(false);
+
+    connect(this, &ProjView::clicked, this, &ProjView::slotTreeViewSingleClicked);
+    connect(this, &ProjView::doubleClicked, this, &ProjView::slotTreeViewDoubleClicked);
 }
 
 QSize ProjView::sizeHint() const
@@ -24,19 +34,19 @@ QSize ProjView::sizeHint() const
 }
 
 /* 创建gpro工程文件 */
-void ProjView::createProjFile(QString filepath)
+bool ProjView::createProjFile(QString filepath)
 {
     QFile file(filepath);
     if (file.exists()) {
         QMessageBox::warning(this, "Error", QString("Project file %1 already exists !").arg(filepath));
-        return;
+        return false;
     }
 
     //以只写方式打开文件
     bool isOK = file.open((QIODevice::WriteOnly));
     if (isOK == false) {
         QMessageBox::warning(this, "Error", QString("Project file %1 create failed !").arg(filepath));
-        return;
+        return false;
     }
 
     this->proFilepath = filepath;
@@ -67,26 +77,27 @@ void ProjView::createProjFile(QString filepath)
     file.close();
 
     //刷新工程树结构
-    refreshProjTreeView();
+    return refreshProjTreeView();
 }
 
 /* 打开gpro工程文件 */
-void ProjView::openProjFile(QString filepath)
+bool ProjView::openProjFile(QString filepath)
 {
     this->proFilepath = filepath;
 
     //刷新工程树结构
-    refreshProjTreeView();
+    return refreshProjTreeView();
 }
 
 /* 关闭gpro工程文件 */
 void ProjView::closeProjFile()
 {
+    this->proFilepath.clear();
     this->clearTreeView();
 }
 
 /* 给工程中追加gml项目文件 */
-void ProjView::appendGmlFile(QString filepath)
+bool ProjView::appendGmlFile(QString filepath)
 {
     QFileInfo info(filepath);
     QString title = info.fileName();
@@ -95,7 +106,10 @@ void ProjView::appendGmlFile(QString filepath)
     QFile file(this->proFilepath);
     file.open(QIODevice::ReadOnly);
     QDomDocument doc;
-    doc.setContent(&file);
+    if (doc.setContent(&file) == false) {
+        QMessageBox::warning(this, "Error", QString("Append gml file failed !"));
+        return false;
+    }
     file.close();
 
     //获取根节点元素
@@ -113,21 +127,45 @@ void ProjView::appendGmlFile(QString filepath)
     file.close();
 
     //刷新工程树结构
-    refreshProjTreeView();
+    return refreshProjTreeView();
+}
+
+/* 设置menuRightBtnProjTree */
+void ProjView::setMenuRightBtnProjTree(QMenu *menuRightBtnProjTree)
+{
+    this->menuRightBtnProjTree = menuRightBtnProjTree;
+}
+
+/* 鼠标按下事件 */
+void ProjView::mousePressEvent(QMouseEvent *event)
+{
+    QTreeView::mousePressEvent(event);
+
+    if (event->button() == Qt::RightButton) {
+        isRightMouseBtnPressed = true;
+        qDebug() << "111111111";
+    }
+
 }
 
 /* 更新项目树结构显示 */
-void ProjView::refreshProjTreeView()
+bool ProjView::refreshProjTreeView()
 {
     //先清空之前的显示
     clearTreeView();
 
     QFile file(this->proFilepath);
-    file.open(QIODevice::ReadOnly);
+    if (file.open(QIODevice::ReadOnly) == false) {
+        QMessageBox::warning(this, "Error", QString("Refresh project tree view failed(1) !"));
+        return false;
+    }
 
     //文件file要和xml文档对象关联
     QDomDocument doc;
-    doc.setContent(&file);
+    if (doc.setContent(&file) == false) {
+        QMessageBox::warning(this, "Error", QString("Refresh project tree view failed(2) !"));
+        return false;
+    }
 
     //关联成功后就可以关闭文件了
     file.close();
@@ -135,7 +173,7 @@ void ProjView::refreshProjTreeView()
     //获取根节点元素
     QDomElement root = doc.documentElement();
 
-    //添加工程顶层节点
+    //添加工程根节点
     QStandardItem *proTopNode = new QStandardItem(QIcon(":/resource/filenew.png"), root.attribute("name"));
     proTopNode->setEditable(false);
     modelTree->appendRow(proTopNode);
@@ -151,12 +189,22 @@ void ProjView::refreshProjTreeView()
 
             //添加文件节点
             QStandardItem *proFileNode = new QStandardItem(QIcon(":/resource/filenew.png"), domElemt.attribute("name"));
+
+            //给这个叶子结点设置数据
+            TreeFileNode_t fileNode;
+            fileNode.name = domElemt.attribute("name");
+            fileNode.path = domElemt.attribute("path");
+            QVariant variant;
+            variant.setValue(fileNode);
+            proFileNode->setData(variant, Qt::UserRole + 1);
             proFileNode->setEditable(false);
             proTopNode->appendRow(proFileNode);
         }
     }
 
     this->expandAll();
+
+    return true;
 }
 
 /* 清空树显示 */
@@ -172,4 +220,32 @@ void ProjView::clearTreeView()
     }
 
     modelTree->clear();
+}
+
+/* treeView单击按钮槽函数 */
+void ProjView::slotTreeViewSingleClicked(const QModelIndex &)
+{
+    qDebug() << "33333";
+    if (isRightMouseBtnPressed == true) {
+        menuRightBtnProjTree->exec(QCursor::pos());
+        isRightMouseBtnPressed = false;
+        qDebug() << "222222";
+    }
+}
+
+/* treeView双击按钮槽函数 */
+void ProjView::slotTreeViewDoubleClicked(const QModelIndex &index)
+{
+    QString text = index.data().toString();
+
+    //工程根节点不处理
+    if (text.contains("gpro") == true) {
+        return;
+    }
+    else {
+        TreeFileNode_t fileNode;
+        fileNode = index.data(Qt::UserRole + 1).value<TreeFileNode_t>();
+        qDebug() << fileNode.name;
+        qDebug() << fileNode.path;
+    }
 }

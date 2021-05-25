@@ -14,6 +14,7 @@
 #include "fullsub/notepadtab.h"
 #include "fullsub/searchdialog.h"
 #include "fullsub/gotolinedialog.h"
+#include "fullsub/createprojectdialog.h"
 
 
 class MainWindow: public QMainWindow
@@ -75,9 +76,15 @@ private:
     QMenu   *recentlyFilesMenu;                 //最近使用过文件的窗口
     QAction *clearRecentlyAct;                  //清除最近使用过的文件
     QMenu   *currentWindowsMenu;                //当前所有tab窗口
+    QActionGroup *currentWindowsActionGrp;      //Window Menu中Current Windows子Menu里的Action组
+    QActionGroup *recentlyFilesActionGrp;       //Window Menu中Recently Files子Menu里的Action组
 
     QMenu   *helpMenu;                          //帮助菜单
     QAction *aboutAct;                          //关于本软件
+
+    QMenu   *menuRightBtnProjTree;              //工程栏右键菜单
+    QAction *addNewFileAct;                     //添加新文件
+    QAction *addExistingFileAct;                //添加现有文件
 
     QDockWidget   *projViewDock;                //工程树结构停靠
     ProjView      *projView;                    //工程树结构
@@ -92,15 +99,18 @@ private:
     void setupBuildMenu();                      //构建菜单功能实现
     void setupWindowMenu();                     //窗口菜单功能实现
     void setupHelpMenu();                       //帮助菜单功能实现
+    void setupProjTree();                       //工程栏右键菜单功能实现
     void setupFileActions();                    //文件菜单Action设置
     void setupEditActions();                    //编辑菜单Action设置
     void setupFormatActions();                  //格式菜单Action设置
     void setupBuildActions();                   //构建菜单Action设置
     void setupWindowActions();                  //窗口菜单Action设置
     void setupHelpActions();                    //帮助菜单Action设置
+    void setupProjTreeActions();                //工程栏右键菜单Action设置
 
     SearchDialog *searchDialog;                 //查找/替换子窗口
     GotolineDialog *gotolineDialog;             //跳转到行子窗口
+    CreateProjectDialog *createProjectDialog;   //创建工程子窗口
 
     //每个tab的信息
     typedef struct {
@@ -111,9 +121,9 @@ private:
 
     QString enCoding;                           //编码格式(目前支持uft-8和gb2312)
     QFont   font;                               //显示字体
-    QActionGroup *currentWindowsActionGrp;      //Window Menu中Current Windows子Menu里的Action组
-    QActionGroup *recentlyFilesActionGrp;       //Window Menu中Recently Files子Menu里的Action组
     GmlDataBase  *gmlDataBase;                  //存放配置信息等的数据库
+    bool hasOpenProj;                           //是否已经打开了一个gpro工程文件
+
 
     void openFileWithFilePath(QString filepath);  //根据文件路径打开文件
 
@@ -152,6 +162,9 @@ private slots:
     void slotClearRecentFiles();                //清除最近打开文件记录
 
     void slotAbout();                           //关于本软件
+
+    void slotProjTreeAddNewFileClicked();       //工程树添加新文件
+    void slotProjTreeAddExistingFileClicked();  //工程树添加现有文件
 
     void slotTabRequestClose(int);              //tab请求关闭
 

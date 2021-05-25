@@ -14,7 +14,8 @@ HEADERS += \
     fullsub/searchdialog.h \
     fullsub/gotolinedialog.h \
     database/gmldatabase.h \
-    fullsub/projview.h
+    fullsub/projview.h \
+    fullsub/createprojectdialog.h
 
 SOURCES += \
     fullscreen/mainwindow.cpp \
@@ -24,14 +25,16 @@ SOURCES += \
     fullsub/searchdialog.cpp \
     fullsub/gotolinedialog.cpp \
     database/gmldatabase.cpp \
-    fullsub/projview.cpp
+    fullsub/projview.cpp \
+    fullsub/createprojectdialog.cpp
 
 INCLUDEPATH += qscitinlla
 LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5d
 
 FORMS += \
     fullsub/searchdialog.ui \
-    fullsub/gotolinedialog.ui
+    fullsub/gotolinedialog.ui \
+    fullsub/createprojectdialog.ui
 
 RESOURCES += \
     gml_ide.qrc
