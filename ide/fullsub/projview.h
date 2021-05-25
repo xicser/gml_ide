@@ -21,11 +21,10 @@ public:
     void closeProjFile();                       //关闭gpro工程文件
     bool appendGmlFile(QString filepath);       //给工程中追加gml项目文件
 
+    void selectFileNodeAccordingFilePath(QString);   //根据文件路径, 选中对应的文件节点
+
     void setMainWindow(MainWindow *);           //设置主窗口
     void setMenuRightBtnProjTree(QMenu *menuRightBtnProjTree); //设置menuRightBtnProjTree
-
-protected:
-    void mousePressEvent(QMouseEvent *event);
 
 private:
     QString proFilepath;                        //工程文件路径
@@ -37,6 +36,7 @@ private:
     bool refreshProjTreeView();                 //更新项目树结构显示
 
 private slots:
+    void slotTreeViewMenuRequested(const QPoint &pos);          //菜单请求
     void slotTreeViewSingleClicked(const QModelIndex &index);   //treeView单击按钮槽函数
     void slotTreeViewDoubleClicked(const QModelIndex &index);   //treeView双击按钮槽函数
 };

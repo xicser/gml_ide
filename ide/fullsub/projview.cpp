@@ -24,6 +24,9 @@ ProjView::ProjView(QWidget *parent) : QTreeView(parent)
     this->setModel(modelTree);
     this->header()->setVisible(false);
 
+    // 为treeView添加右键菜单
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, &QTreeView::customContextMenuRequested, this, &ProjView::slotTreeViewMenuRequested);
     connect(this, &ProjView::clicked, this, &ProjView::slotTreeViewSingleClicked);
     connect(this, &ProjView::doubleClicked, this, &ProjView::slotTreeViewDoubleClicked);
 }
@@ -130,6 +133,35 @@ bool ProjView::appendGmlFile(QString filepath)
     return refreshProjTreeView();
 }
 
+/* 根据文件路径, 选中对应的文件节点 */
+void ProjView::selectFileNodeAccordingFilePath(QString filepath)
+{
+    //遍历根节点下的所有节点
+    QStandardItem *itemRoot = modelTree->item(0);
+
+    for (int i = 0; i < itemRoot->rowCount(); i++) {
+
+        QStandardItem *childitem = itemRoot->child(i);
+        TreeFileNode_t fileNode;
+        fileNode = childitem->data(Qt::UserRole + 1).value<TreeFileNode_t>();
+        qDebug() << fileNode.path;
+//        //找到这个节点
+//        if (fileNode.path == filepath) {
+
+//            QStandardItem *item = itemRoot->child(i);
+//            QModelIndex headModelIndex = item->model()->index(i - 1, 0, item->index());
+//            QModelIndex tailModelIndex = item->model()->index(i - 1, 0, item->index());
+
+//            QItemSelectionModel *selectionModel = this->selectionModel();
+//            QItemSelection itemSelection(headModelIndex, tailModelIndex);
+//            selectionModel->select(itemSelection, QItemSelectionModel::Select);
+
+//            break;
+//        }
+    }
+    this->expandAll();
+}
+
 /* 设置主窗口 */
 void ProjView::setMainWindow(MainWindow *mainWindow)
 {
@@ -140,19 +172,6 @@ void ProjView::setMainWindow(MainWindow *mainWindow)
 void ProjView::setMenuRightBtnProjTree(QMenu *menuRightBtnProjTree)
 {
     this->menuRightBtnProjTree = menuRightBtnProjTree;
-}
-
-/* 鼠标按下事件 */
-void ProjView::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::RightButton) {
-        if (mainWindow->getHasOpenProj() == true) {
-            menuRightBtnProjTree->exec(QCursor::pos());
-        }
-        return;
-    }
-
-    QTreeView::mousePressEvent(event);
 }
 
 /* 更新项目树结构显示 */
@@ -229,10 +248,44 @@ void ProjView::clearTreeView()
     modelTree->clear();
 }
 
+/* 菜单请求 */
+void ProjView::slotTreeViewMenuRequested(const QPoint &pos)
+{
+    QModelIndex curIndex = this->indexAt(pos);
+
+    //右键选中了有效index
+    if (curIndex.isValid()) {
+        QString text = curIndex.data().toString();
+
+        //右键单击在工程节点上
+        if (text.contains("gpro") == true) {
+            menuRightBtnProjTree->exec(QCursor::pos());
+            return;
+        }
+        //右键单击在文件节点上
+        if (text.contains("gpro") == false) {
+
+            //TODO: 弹出移除文件菜单
+            qDebug() << "TODO: 弹出移除文件菜单";
+
+            return;
+        }
+    }
+}
+
 /* treeView单击按钮槽函数 */
 void ProjView::slotTreeViewSingleClicked(const QModelIndex &index)
 {
-    qDebug() << "SingleClicked";
+    QString text = index.data().toString();
+
+    //左键单击在文件节点上
+    if (text.contains("gpro") == false) {
+        TreeFileNode_t fileNode;
+        fileNode = index.data(Qt::UserRole + 1).value<TreeFileNode_t>();
+
+        //跳转到这个文件对应的tab
+        mainWindow->jumpToTabAccordingFilePath(fileNode.path);
+    }
 }
 
 /* treeView双击按钮槽函数 */
@@ -247,6 +300,7 @@ void ProjView::slotTreeViewDoubleClicked(const QModelIndex &index)
 
     TreeFileNode_t fileNode;
     fileNode = index.data(Qt::UserRole + 1).value<TreeFileNode_t>();
-    // qDebug() << fileNode.name;
-    qDebug() << fileNode.path;
+
+    //打开这个文件
+    mainWindow->openFileWithFilePath(fileNode.path);
 }

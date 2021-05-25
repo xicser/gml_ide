@@ -23,7 +23,10 @@ public:
     MainWindow(QWidget * = 0);
     ~MainWindow();
 
-    bool getHasOpenProj();                      //获取hasOpenProj
+    bool getHasOpenProj();                        //获取hasOpenProj
+    void openFileWithFilePath(QString filepath);  //根据文件路径打开文件
+    void jumpToTabAccordingFilePath(QString);     //根据文件路径, 跳转到其对应的tab
+
 
 protected:
     void closeEvent(QCloseEvent *);
@@ -125,9 +128,6 @@ private:
     GmlDataBase  *gmlDataBase;                  //存放配置信息等的数据库
     bool hasOpenProj;                           //是否已经打开了一个gpro工程文件
 
-
-    void openFileWithFilePath(QString filepath);  //根据文件路径打开文件
-
 private slots:
     void slotCreateProject();                   //创建工程
     void slotOpenProject();                     //打开工程
@@ -168,6 +168,7 @@ private slots:
     void slotProjTreeAddExistingFileClicked();  //工程树添加现有文件
 
     void slotTabRequestClose(int);              //tab请求关闭
+    void slotCurrentChanged(int);               //当前tab被改变
 
 public slots:
     void slotNotePadContentChanged(NotePadTab *notePadTab);     //接收某个notePadTab内容改变的槽

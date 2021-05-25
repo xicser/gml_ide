@@ -65,6 +65,18 @@ bool MainWindow::getHasOpenProj()
     return this->hasOpenProj;
 }
 
+/* 根据文件路径, 跳转到其对应的tab */
+void MainWindow::jumpToTabAccordingFilePath(QString filepath)
+{
+    for (int i = 0; i < this->tabInfoList.size(); i++) {
+        if (tabInfoList[i].filePath == filepath) {
+            NotePadTab *notePadTab = tabInfoList[i].notePadTab;
+            this->tabWidget->setCurrentWidget(notePadTab);
+            break;
+        }
+    }
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     bool isCancel = slotFileCloseAll();
@@ -128,6 +140,7 @@ void MainWindow::init()
     tabWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     tabWidget->setTabsClosable(true);
     connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::slotTabRequestClose);
+    connect(tabWidget, &QTabWidget::currentChanged, this, &MainWindow::slotCurrentChanged);
     this->setCentralWidget(tabWidget);
 
     //全屏显示
@@ -1343,6 +1356,16 @@ void MainWindow::slotTabRequestClose(int index)
 {
     this->tabWidget->setCurrentIndex(index);
     this->slotFileClose();
+}
+
+/* 当前tab被改变 */
+void MainWindow::slotCurrentChanged(int index)
+{
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->widget(index));
+
+    //选中左侧工程树中对应的文件
+    projView->selectFileNodeAccordingFilePath(notePadTabActive->getFilePath());
 }
 
 /* 接收某个notePadTab内容改变的槽 */
