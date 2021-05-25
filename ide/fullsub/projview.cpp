@@ -1,4 +1,5 @@
 #include "projview.h"
+#include "fullscreen/mainwindow.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -19,7 +20,6 @@ Q_DECLARE_METATYPE(TreeFileNode_t)
 
 ProjView::ProjView(QWidget *parent) : QTreeView(parent)
 {
-    isRightMouseBtnPressed = false;
     modelTree = new QStandardItemModel(this);
     this->setModel(modelTree);
     this->header()->setVisible(false);
@@ -130,6 +130,12 @@ bool ProjView::appendGmlFile(QString filepath)
     return refreshProjTreeView();
 }
 
+/* 设置主窗口 */
+void ProjView::setMainWindow(MainWindow *mainWindow)
+{
+    this->mainWindow = mainWindow;
+}
+
 /* 设置menuRightBtnProjTree */
 void ProjView::setMenuRightBtnProjTree(QMenu *menuRightBtnProjTree)
 {
@@ -139,13 +145,14 @@ void ProjView::setMenuRightBtnProjTree(QMenu *menuRightBtnProjTree)
 /* 鼠标按下事件 */
 void ProjView::mousePressEvent(QMouseEvent *event)
 {
-    QTreeView::mousePressEvent(event);
-
     if (event->button() == Qt::RightButton) {
-        isRightMouseBtnPressed = true;
-        qDebug() << "111111111";
+        if (mainWindow->getHasOpenProj() == true) {
+            menuRightBtnProjTree->exec(QCursor::pos());
+        }
+        return;
     }
 
+    QTreeView::mousePressEvent(event);
 }
 
 /* 更新项目树结构显示 */
@@ -223,14 +230,9 @@ void ProjView::clearTreeView()
 }
 
 /* treeView单击按钮槽函数 */
-void ProjView::slotTreeViewSingleClicked(const QModelIndex &)
+void ProjView::slotTreeViewSingleClicked(const QModelIndex &index)
 {
-    qDebug() << "33333";
-    if (isRightMouseBtnPressed == true) {
-        menuRightBtnProjTree->exec(QCursor::pos());
-        isRightMouseBtnPressed = false;
-        qDebug() << "222222";
-    }
+    qDebug() << "SingleClicked";
 }
 
 /* treeView双击按钮槽函数 */
@@ -242,10 +244,9 @@ void ProjView::slotTreeViewDoubleClicked(const QModelIndex &index)
     if (text.contains("gpro") == true) {
         return;
     }
-    else {
-        TreeFileNode_t fileNode;
-        fileNode = index.data(Qt::UserRole + 1).value<TreeFileNode_t>();
-        qDebug() << fileNode.name;
-        qDebug() << fileNode.path;
-    }
+
+    TreeFileNode_t fileNode;
+    fileNode = index.data(Qt::UserRole + 1).value<TreeFileNode_t>();
+    // qDebug() << fileNode.name;
+    qDebug() << fileNode.path;
 }

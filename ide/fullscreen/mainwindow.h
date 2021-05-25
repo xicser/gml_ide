@@ -6,23 +6,24 @@
 #include <QTabWidget>
 #include <QStatusBar>
 #include <QCloseEvent>
-
+#include <QActionGroup>
 #include "database/gmldatabase.h"
 
-#include "fullsub/projview.h"
 #include "fullsub/logtextedit.h"
 #include "fullsub/notepadtab.h"
 #include "fullsub/searchdialog.h"
 #include "fullsub/gotolinedialog.h"
 #include "fullsub/createprojectdialog.h"
 
-
+class ProjView;
 class MainWindow: public QMainWindow
 {
     Q_OBJECT
 public:
     MainWindow(QWidget * = 0);
     ~MainWindow();
+
+    bool getHasOpenProj();                      //获取hasOpenProj
 
 protected:
     void closeEvent(QCloseEvent *);

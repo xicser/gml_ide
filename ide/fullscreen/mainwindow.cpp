@@ -1,4 +1,6 @@
 #include "mainwindow.h"
+#include "fullsub/projview.h"
+
 #include <QColorDialog>
 #include <QFontDialog>
 #include <QTextStream>
@@ -57,6 +59,12 @@ MainWindow::~MainWindow()
     }
 }
 
+/* 获取hasOpenProj */
+bool MainWindow::getHasOpenProj()
+{
+    return this->hasOpenProj;
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     bool isCancel = slotFileCloseAll();
@@ -104,6 +112,7 @@ void MainWindow::init()
     projView = new ProjView(projViewDock);
     projViewDock->setWidget(projView);
     this->addDockWidget(Qt::LeftDockWidgetArea, projViewDock);
+    projView->setMainWindow(this);
 
     //log输出框停靠结构
     logDock = new QDockWidget("Output", this);
@@ -615,11 +624,55 @@ void MainWindow::slotFileNew()
 
     //如果当前有打开的工程, 则提示是否添加到工程中
     if (hasOpenProj == true) {
+
         QMessageBox::StandardButton ret = QMessageBox::information(this, "Info", "Do you want to add this new file to the current project ?",
                                                                     QMessageBox::Yes | QMessageBox::No);
         if (ret == QMessageBox::Yes) {
-            slotFileSave(); //先保存这个文件
+
+            //获取保存路径
+            QString filepath = QFileDialog::getSaveFileName(this, "Save file", ".", "gml source(*.gml);;all(*.*)");
+            if (filepath.isEmpty() == true) {
+                return;
+            }
+
+            disconnect(tabInfo.notePadTab, &QsciScintilla::textChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
+            disconnect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
+
+            //保存这个文件路径到最近打开文件列表
+            gmlDataBase->insertRencentFileList(filepath);
+
+            //先获取当前活动的子窗体
+            NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+            int index = this->tabWidget->indexOf(notePadTabActive);
+
+            //设置新的title
+            tabInfo.notePadTab->setFilePath(filepath);
+            tabInfo.notePadTab->setEditStatus(false);
+            this->tabWidget->setTabText(index, tabInfo.notePadTab->getFileName());
+
+            //修改list里面对应的文件路径
+            for (int i = 0; i < tabInfoList.size(); i++) {
+                if (tabInfoList[i].notePadTab == notePadTabActive) {
+                    tabInfoList[i].filePath = filepath;
+                    break;
+                }
+            }
+
+            //创建文件
+            QFile file(this);
+            file.setFileName(filepath);
+            bool ret = file.open(QIODevice::WriteOnly | QIODevice::Text);
+            if (ret == false) {
+                QMessageBox::warning(this, "Error", "Add failed !");
+                return;
+            }
+            file.close();
+
+            //左侧项目树添加节点
             projView->appendGmlFile(tabInfo.notePadTab->getFilePath());
+
+            connect(tabInfo.notePadTab, &QsciScintilla::textChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
+            connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
         }
     }
 }
@@ -1234,13 +1287,55 @@ void MainWindow::slotAbout()
 /* 工程树添加新文件 */
 void MainWindow::slotProjTreeAddNewFileClicked()
 {
-    qDebug() << "新文件";
+    QString filepath = QFileDialog::getSaveFileName(this, "Add new file", ".", "gml source(*.gml);;all(*.*)");
+    if (filepath.isEmpty() == true) {
+        return;
+    }
+
+    //保存这个文件路径到最近打开文件列表
+    gmlDataBase->insertRencentFileList(filepath);
+
+    //创建一个新的tab
+    Tab_Info_t tabInfo;
+    tabInfo.notePadTab = new NotePadTab(tabWidget);
+    tabInfo.notePadTab->setEncoding(this->enCoding);
+    tabInfo.notePadTab->setLexerFont(this->font);
+    tabInfo.notePadTab->setEditStatus(false);
+    tabInfo.filePath = filepath;
+    tabInfo.notePadTab->setFilePath(tabInfo.filePath);
+    tabInfoList << tabInfo;
+
+    this->tabWidget->addTab(tabInfo.notePadTab, tabInfo.notePadTab->getFileName());
+    connect(tabInfo.notePadTab, &QsciScintilla::textChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
+    connect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
+
+    //聚焦到刚刚新建的文件tab上
+    this->tabWidget->setCurrentWidget(tabInfo.notePadTab);
+    tabInfo.notePadTab->setFocus();
+
+    //把窗口中的内容写进文件
+    QFile file(this);
+    file.setFileName(filepath);
+    bool ret = file.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (ret == false) {
+        QMessageBox::warning(this, "Error", "Add failed !");
+        return;
+    }
+    file.close();
+
+    //左侧项目树添加节点
+    projView->appendGmlFile(tabInfo.notePadTab->getFilePath());
 }
 
 /* 工程树添加现有文件 */
 void MainWindow::slotProjTreeAddExistingFileClicked()
 {
-    qDebug() << "现有文件";
+    QStringList filepaths = QFileDialog::getOpenFileNames(this, "Add existing files...", ".",
+             "gml source(*.gml);;all(*.*)");
+
+    for (int i = 0; i < filepaths.size(); i++) {
+        projView->appendGmlFile(filepaths[i]);
+    }
 }
 
 /* tab请求关闭 */
