@@ -605,6 +605,46 @@ void MainWindow::slotOpenProject()
 /* 关闭工程 */
 void MainWindow::slotCloseProject()
 {
+    //保存本工程中包含的文件
+    QStringList pathList = projView->getProjFilePaths();
+
+    for (int i = 0; i < this->tabInfoList.size(); i++) {
+        if (pathList.contains(tabInfoList[i].filePath) == true) {
+
+            //先获取当前活动的子窗体
+            NotePadTab *notePadTabActive = tabInfoList[i].notePadTab;
+
+            //从未改变过的文件, 根本不需要保存
+            if (notePadTabActive->getEditStatus() == false) {
+                return;
+            }
+
+            //把字窗口中的内容写进文件
+            QFile file(this);
+            file.setFileName(notePadTabActive->getFilePath());
+            bool ret = file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
+            if (ret == false) {
+                QMessageBox::warning(this, "Error", "Save failed !");
+                return;
+            }
+            QTextStream stream(&file);
+            //设置流的编码格式
+            if (this->enCoding == "utf-8") {
+                stream.setCodec("UTF-8");
+            } else {
+                stream.setCodec("GB18030");
+            }
+            stream << notePadTabActive->text();
+            stream.flush();
+            file.close();
+
+            QFileInfo info(notePadTabActive->getFilePath());
+            QString title = info.fileName();
+            //this->tabWidget->setTabText(index, title);
+            notePadTabActive->setEditStatus(false);
+        }
+    }
+
     projView->closeProjFile();
     this->hasOpenProj = false;
 }

@@ -7,6 +7,7 @@
 #include <QMouseEvent>
 #include <QMenu>
 #include <QDebug>
+#include <QStringList>
 
 class MainWindow;
 class ProjView : public QTreeView
@@ -23,6 +24,7 @@ public:
     bool removeGmlFile();                       //从工程中移除gml项目文件
 
     void selectFileNodeAccordingFilePath(QString);   //根据文件路径, 选中对应的文件节点
+    QStringList getProjFilePaths();             //获取本工程文件路径列表
 
     void setMainWindow(MainWindow *);           //设置主窗口
     void setMenuRightBtnProjTree(QMenu *menuRightBtnProjTree); //设置menuRightBtnProjTree

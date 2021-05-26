@@ -216,6 +216,39 @@ void ProjView::selectFileNodeAccordingFilePath(QString filepath)
     this->expandAll();
 }
 
+/* 获取本工程文件路径列表 */
+QStringList ProjView::getProjFilePaths()
+{
+    QStringList pathList;
+
+    QFile file(this->proFilepath);
+    file.open(QIODevice::ReadOnly);
+
+    //文件file要和xml文档对象关联
+    QDomDocument doc;
+    doc.setContent(&file);
+
+    //关联成功后就可以关闭文件了
+    file.close();
+
+    //获取根节点元素
+    QDomElement root = doc.documentElement();
+
+    //判断有没有子节点
+    if (root.hasChildNodes()) {
+
+        //遍历所有子节点
+        QDomNodeList list = root.childNodes();
+        for (int i = 0; i < list.size(); i++) {
+
+            QDomElement domElemt = list.at(i).toElement();
+            pathList << domElemt.attribute("path");
+        }
+    }
+
+    return pathList;
+}
+
 /* 设置主窗口 */
 void ProjView::setMainWindow(MainWindow *mainWindow)
 {
