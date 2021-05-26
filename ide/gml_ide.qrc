@@ -41,5 +41,8 @@
         <file>resource/zoomin.png</file>
         <file>resource/zoomout.png</file>
         <file>resource/gotoline.png</file>
+        <file>resource/openproj.png</file>
+        <file>resource/createproj.png</file>
+        <file>resource/closeproj.png</file>
     </qresource>
 </RCC>

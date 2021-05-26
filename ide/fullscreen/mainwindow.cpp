@@ -160,17 +160,17 @@ void MainWindow::setupFileMenu()
     fileMenu = new QMenu("&File", menuBar);
 
     //新建工程
-    newProjAct = new QAction(QIcon(":/resource/filenew.png"), "&Create Project", this);
+    newProjAct = new QAction(QIcon(":/resource/createproj.png"), "&Create Project", this);
     fileMenu->addAction(newProjAct);
     topToolBar->addAction(newProjAct);
 
     //打开工程
-    openProjAct = new QAction(QIcon(":/resource/filenew.png"), "&Open Project", this);
+    openProjAct = new QAction(QIcon(":/resource/openproj.png"), "&Open Project", this);
     fileMenu->addAction(openProjAct);
     topToolBar->addAction(openProjAct);
 
     //关闭工程
-    closeProjAct = new QAction(QIcon(":/resource/filenew.png"), "&Close Project", this);
+    closeProjAct = new QAction(QIcon(":/resource/closeproj.png"), "&Close Project", this);
     fileMenu->addAction(closeProjAct);
     topToolBar->addAction(closeProjAct);
     topToolBar->addSeparator();
@@ -575,6 +575,11 @@ void MainWindow::slotCreateProject()
 
     connect(createProjectDialog, &CreateProjectDialog::signalConfirmBtnClicked , [=]() {
 
+        //先关闭之前的工程
+        if (this->hasOpenProj == true) {
+            slotCloseProject();
+        }
+
         //创建工程
         bool isSuccess = projView->createProjFile(createProjectDialog->getProjectFilePath() + "/"
                                  + createProjectDialog->getProjectFileName() + ".gpro");
@@ -589,6 +594,11 @@ void MainWindow::slotCreateProject()
 /* 打开工程 */
 void MainWindow::slotOpenProject()
 {
+    //先关闭之前的工程
+    if (this->hasOpenProj == true) {
+        slotCloseProject();
+    }
+
     QString gproPath = QFileDialog::getOpenFileName(this, "Select project...", ".",
              "gml project(*.gpro);;all(*.*)");
 
@@ -605,44 +615,61 @@ void MainWindow::slotOpenProject()
 /* 关闭工程 */
 void MainWindow::slotCloseProject()
 {
-    //保存本工程中包含的文件
-    QStringList pathList = projView->getProjFilePaths();
+    if (this->hasOpenProj == false) {
+        return;
+    }
 
+    //保存本工程中包含的文件, 最后关闭它们
+    QStringList pathList = projView->getProjFilePaths();
+    QList <NotePadTab *> tabToRemoveList;
+
+    //把要关闭的tab找出来
     for (int i = 0; i < this->tabInfoList.size(); i++) {
         if (pathList.contains(tabInfoList[i].filePath) == true) {
 
-            //先获取当前活动的子窗体
-            NotePadTab *notePadTabActive = tabInfoList[i].notePadTab;
+            NotePadTab *notePadTab = tabInfoList[i].notePadTab;
 
-            //从未改变过的文件, 根本不需要保存
-            if (notePadTabActive->getEditStatus() == false) {
-                return;
+            //如果文件处于编辑状态, 则保存
+            if (notePadTab->getEditStatus() == true) {
+                //把字窗口中的内容写进文件
+                QFile file(this);
+                file.setFileName(notePadTab->getFilePath());
+                bool ret = file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
+                if (ret == false) {
+                    QMessageBox::warning(this, "Error", "Save failed !");
+                    return;
+                }
+                QTextStream stream(&file);
+                //设置流的编码格式
+                if (this->enCoding == "utf-8") {
+                    stream.setCodec("UTF-8");
+                } else {
+                    stream.setCodec("GB18030");
+                }
+                stream << notePadTab->text();
+                stream.flush();
+                file.close();
             }
 
-            //把字窗口中的内容写进文件
-            QFile file(this);
-            file.setFileName(notePadTabActive->getFilePath());
-            bool ret = file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
-            if (ret == false) {
-                QMessageBox::warning(this, "Error", "Save failed !");
-                return;
-            }
-            QTextStream stream(&file);
-            //设置流的编码格式
-            if (this->enCoding == "utf-8") {
-                stream.setCodec("UTF-8");
-            } else {
-                stream.setCodec("GB18030");
-            }
-            stream << notePadTabActive->text();
-            stream.flush();
-            file.close();
-
-            QFileInfo info(notePadTabActive->getFilePath());
-            QString title = info.fileName();
-            //this->tabWidget->setTabText(index, title);
-            notePadTabActive->setEditStatus(false);
+            //记录即将关闭的tab
+            tabToRemoveList << notePadTab;
         }
+    }
+
+    //统一关闭当前工程中的文件tab
+    for (int i = 0; i < tabToRemoveList.size(); i++) {
+        int index = this->tabWidget->indexOf(tabToRemoveList[i]);
+        this->tabWidget->removeTab(index);
+
+        //从list里面剔除
+        for (int j = 0; j < tabInfoList.size(); j++) {
+            if (tabToRemoveList[i] == tabInfoList[j].notePadTab) {
+                tabInfoList.removeAt(j);
+                break;
+            }
+        }
+
+        delete tabToRemoveList[i];
     }
 
     projView->closeProjFile();
