@@ -86,9 +86,11 @@ private:
     QMenu   *helpMenu;                          //帮助菜单
     QAction *aboutAct;                          //关于本软件
 
-    QMenu   *menuRightBtnProjTree;              //工程栏右键菜单
+    QMenu   *menuRightBtnProjTree;              //工程右键菜单
     QAction *addNewFileAct;                     //添加新文件
     QAction *addExistingFileAct;                //添加现有文件
+    QMenu   *menuRightBtnFileTree;              //文件右键菜单
+    QAction *addRemoveFileAct;                  //移除文件
 
     QDockWidget   *projViewDock;                //工程树结构停靠
     ProjView      *projView;                    //工程树结构
@@ -166,6 +168,7 @@ private slots:
 
     void slotProjTreeAddNewFileClicked();       //工程树添加新文件
     void slotProjTreeAddExistingFileClicked();  //工程树添加现有文件
+    void slotProjTreeRemoveFileClicked();       //工程树移除文件
 
     void slotTabRequestClose(int);              //tab请求关闭
     void slotTabBarClicked(int);                //tab被点击

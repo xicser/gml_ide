@@ -406,7 +406,6 @@ void MainWindow::setupHelpMenu()
 /* 工程栏右键菜单功能实现 */
 void MainWindow::setupProjTree()
 {
-    //右键菜单: 图形
     menuRightBtnProjTree = new QMenu(this);
 
     addNewFileAct = new QAction("Add new gml files...", menuRightBtnProjTree);
@@ -415,7 +414,13 @@ void MainWindow::setupProjTree()
     menuRightBtnProjTree->addAction(addExistingFileAct);
     menuRightBtnProjTree->hide();
 
+    menuRightBtnFileTree = new QMenu(this);
+    addRemoveFileAct = new QAction("Remove this file", menuRightBtnFileTree);
+    menuRightBtnFileTree->addAction(addRemoveFileAct);
+    menuRightBtnFileTree->hide();
+
     this->projView->setMenuRightBtnProjTree(menuRightBtnProjTree);
+    this->projView->setMenuRightBtnFileTree(menuRightBtnFileTree);
 }
 
 /* 文件菜单Action设置 */
@@ -488,6 +493,7 @@ void MainWindow::setupProjTreeActions()
 {
     connect(addNewFileAct, &QAction::triggered, this, &MainWindow::slotProjTreeAddNewFileClicked);
     connect(addExistingFileAct, &QAction::triggered, this, &MainWindow::slotProjTreeAddExistingFileClicked);
+    connect(addRemoveFileAct, &QAction::triggered, this, &MainWindow::slotProjTreeRemoveFileClicked);
 }
 
 /* 根据文件路径打开文件 */
@@ -1349,6 +1355,12 @@ void MainWindow::slotProjTreeAddExistingFileClicked()
     for (int i = 0; i < filepaths.size(); i++) {
         projView->appendGmlFile(filepaths[i]);
     }
+}
+
+/* 工程树移除文件 */
+void MainWindow::slotProjTreeRemoveFileClicked()
+{
+    projView->removeGmlFile();
 }
 
 /* tab请求关闭 */

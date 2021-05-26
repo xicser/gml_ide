@@ -102,6 +102,12 @@ void ProjView::closeProjFile()
 /* 给工程中追加gml项目文件 */
 bool ProjView::appendGmlFile(QString filepath)
 {
+    //先检查这个文件是否已经属于本工程
+    if (isBelongToProj(filepath) == true) {
+        QMessageBox::warning(this, "Error", QString("File %1 already belongs to this project !").arg(filepath));
+        return false;
+    }
+
     QFileInfo info(filepath);
     QString title = info.fileName();
 
@@ -128,6 +134,53 @@ bool ProjView::appendGmlFile(QString filepath)
     QTextStream stream(&file);
     doc.save(stream, 4);
     file.close();
+
+    //刷新工程树结构
+    return refreshProjTreeView();
+}
+
+/* 从工程中移除gml项目文件 */
+bool ProjView::removeGmlFile()
+{
+    QFile file(this->proFilepath);
+    if (file.open(QIODevice::ReadOnly) == false) {
+        QMessageBox::warning(this, "Error", QString("Remove file failed(1) !"));
+        return false;
+    }
+
+    //文件file要和xml文档对象关联
+    QDomDocument doc;
+    if (doc.setContent(&file) == false) {
+        QMessageBox::warning(this, "Error", QString("Remove file failed(2) !"));
+        return false;
+    }
+
+    //关联成功后就可以关闭文件了
+    file.close();
+
+    //获取根节点元素
+    QDomElement root = doc.documentElement();
+
+    //判断有没有子节点
+    if (root.hasChildNodes()) {
+
+        //找到文件路径相同的那个节点, 从工程文件中删除它
+        QDomNodeList list = root.childNodes();
+        for (int i = 0; i < list.size(); i++) {
+
+            QDomElement domElemt = list.at(i).toElement();
+            if (domElemt.attribute("path") == currentSelectedFilePath) {
+                root.removeChild(list.at(i));
+
+                //保存文件
+                file.open(QIODevice::WriteOnly);
+                QTextStream stream(&file);
+                doc.save(stream, 4);
+                file.close();
+                break;
+            }
+        }
+    }
 
     //刷新工程树结构
     return refreshProjTreeView();
@@ -173,6 +226,12 @@ void ProjView::setMainWindow(MainWindow *mainWindow)
 void ProjView::setMenuRightBtnProjTree(QMenu *menuRightBtnProjTree)
 {
     this->menuRightBtnProjTree = menuRightBtnProjTree;
+}
+
+/* 设置menuRightBtnFileTree */
+void ProjView::setMenuRightBtnFileTree(QMenu *menuRightBtnFileTree)
+{
+    this->menuRightBtnFileTree = menuRightBtnFileTree;
 }
 
 /* 更新项目树结构显示 */
@@ -234,6 +293,39 @@ bool ProjView::refreshProjTreeView()
     return true;
 }
 
+/* 检查当前文件是否已经在工程中 */
+bool ProjView::isBelongToProj(QString filepath)
+{
+    QFile file(this->proFilepath);
+    file.open(QIODevice::ReadOnly);
+
+    //文件file要和xml文档对象关联
+    QDomDocument doc;
+    doc.setContent(&file);
+
+    //关联成功后就可以关闭文件了
+    file.close();
+
+    //获取根节点元素
+    QDomElement root = doc.documentElement();
+
+    //判断有没有子节点
+    if (root.hasChildNodes()) {
+
+        //遍历所有子节点
+        QDomNodeList list = root.childNodes();
+        for (int i = 0; i < list.size(); i++) {
+
+            QDomElement domElemt = list.at(i).toElement();
+            if (domElemt.attribute("path") == filepath) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 /* 清空树显示 */
 void ProjView::clearTreeView()
 {
@@ -253,6 +345,9 @@ void ProjView::clearTreeView()
 void ProjView::slotTreeViewMenuRequested(const QPoint &pos)
 {
     QModelIndex curIndex = this->indexAt(pos);
+    TreeFileNode_t fileNode;
+    fileNode = curIndex.data(Qt::UserRole + 1).value<TreeFileNode_t>();
+    currentSelectedFilePath = fileNode.path;
 
     //右键选中了有效index
     if (curIndex.isValid()) {
@@ -265,10 +360,7 @@ void ProjView::slotTreeViewMenuRequested(const QPoint &pos)
         }
         //右键单击在文件节点上
         if (text.contains("gpro") == false) {
-
-            //TODO: 弹出移除文件菜单
-            qDebug() << "TODO: 弹出移除文件菜单";
-
+            menuRightBtnFileTree->exec(QCursor::pos());
             return;
         }
     }
@@ -287,6 +379,10 @@ void ProjView::slotTreeViewSingleClicked(const QModelIndex &index)
         //跳转到这个文件对应的tab
         mainWindow->jumpToTabAccordingFilePath(fileNode.path);
     }
+
+    TreeFileNode_t fileNode;
+    fileNode = index.data(Qt::UserRole + 1).value<TreeFileNode_t>();
+    currentSelectedFilePath = fileNode.path;
 }
 
 /* treeView双击按钮槽函数 */
@@ -301,6 +397,7 @@ void ProjView::slotTreeViewDoubleClicked(const QModelIndex &index)
 
     TreeFileNode_t fileNode;
     fileNode = index.data(Qt::UserRole + 1).value<TreeFileNode_t>();
+    currentSelectedFilePath = fileNode.path;
 
     //打开这个文件
     mainWindow->openFileWithFilePath(fileNode.path);

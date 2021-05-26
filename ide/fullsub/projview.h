@@ -20,18 +20,23 @@ public:
     bool openProjFile(QString filepath);        //打开gpro工程文件
     void closeProjFile();                       //关闭gpro工程文件
     bool appendGmlFile(QString filepath);       //给工程中追加gml项目文件
+    bool removeGmlFile();                       //从工程中移除gml项目文件
 
     void selectFileNodeAccordingFilePath(QString);   //根据文件路径, 选中对应的文件节点
 
     void setMainWindow(MainWindow *);           //设置主窗口
     void setMenuRightBtnProjTree(QMenu *menuRightBtnProjTree); //设置menuRightBtnProjTree
+    void setMenuRightBtnFileTree(QMenu *menuRightBtnFileTree); //设置menuRightBtnFileTree
 
 private:
     QString proFilepath;                        //工程文件路径
+    QString currentSelectedFilePath;            //当前选中文件节点的路径
     QStandardItemModel   *modelTree;            //树结构模型
     MainWindow *mainWindow;                     //主窗口
-    QMenu *menuRightBtnProjTree;                //右键菜单
+    QMenu *menuRightBtnProjTree;                //右键工程菜单
+    QMenu *menuRightBtnFileTree;                //右键文件菜单
 
+    bool isBelongToProj(QString filepath);      //检查当前文件是否已经在工程中
     void clearTreeView();                       //清空树显示
     bool refreshProjTreeView();                 //更新项目树结构显示
 
