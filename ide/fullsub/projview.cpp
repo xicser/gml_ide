@@ -136,6 +136,9 @@ bool ProjView::appendGmlFile(QString filepath)
 /* 根据文件路径, 选中对应的文件节点 */
 void ProjView::selectFileNodeAccordingFilePath(QString filepath)
 {
+    //先清除之前的选中情况
+    this->selectionModel()->clear();
+
     //遍历根节点下的所有节点
     QStandardItem *itemRoot = modelTree->item(0);
 
@@ -144,20 +147,18 @@ void ProjView::selectFileNodeAccordingFilePath(QString filepath)
         QStandardItem *childitem = itemRoot->child(i);
         TreeFileNode_t fileNode;
         fileNode = childitem->data(Qt::UserRole + 1).value<TreeFileNode_t>();
-        qDebug() << fileNode.path;
-//        //找到这个节点
-//        if (fileNode.path == filepath) {
 
-//            QStandardItem *item = itemRoot->child(i);
-//            QModelIndex headModelIndex = item->model()->index(i - 1, 0, item->index());
-//            QModelIndex tailModelIndex = item->model()->index(i - 1, 0, item->index());
+        //找到这个节点
+        if (fileNode.path == filepath) {
+            QModelIndex headModelIndex = childitem->model()->index(i, 0, itemRoot->index());
+            QModelIndex tailModelIndex = childitem->model()->index(i, 0, itemRoot->index());
 
-//            QItemSelectionModel *selectionModel = this->selectionModel();
-//            QItemSelection itemSelection(headModelIndex, tailModelIndex);
-//            selectionModel->select(itemSelection, QItemSelectionModel::Select);
+            QItemSelectionModel *selectionModel = this->selectionModel();
+            QItemSelection itemSelection(headModelIndex, tailModelIndex);
+            selectionModel->select(itemSelection, QItemSelectionModel::Select);
 
-//            break;
-//        }
+            break;
+        }
     }
     this->expandAll();
 }

@@ -140,7 +140,7 @@ void MainWindow::init()
     tabWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     tabWidget->setTabsClosable(true);
     connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::slotTabRequestClose);
-    connect(tabWidget, &QTabWidget::currentChanged, this, &MainWindow::slotCurrentChanged);
+    connect(tabWidget, &QTabWidget::tabBarClicked, this, &MainWindow::slotTabBarClicked);
     this->setCentralWidget(tabWidget);
 
     //全屏显示
@@ -1358,8 +1358,8 @@ void MainWindow::slotTabRequestClose(int index)
     this->slotFileClose();
 }
 
-/* 当前tab被改变 */
-void MainWindow::slotCurrentChanged(int index)
+/* tab被点击 */
+void MainWindow::slotTabBarClicked(int index)
 {
     //先获取当前活动的子窗体
     NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->widget(index));

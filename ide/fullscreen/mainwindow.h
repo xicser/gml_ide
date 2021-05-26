@@ -168,7 +168,7 @@ private slots:
     void slotProjTreeAddExistingFileClicked();  //工程树添加现有文件
 
     void slotTabRequestClose(int);              //tab请求关闭
-    void slotCurrentChanged(int);               //当前tab被改变
+    void slotTabBarClicked(int);                //tab被点击
 
 public slots:
     void slotNotePadContentChanged(NotePadTab *notePadTab);     //接收某个notePadTab内容改变的槽
