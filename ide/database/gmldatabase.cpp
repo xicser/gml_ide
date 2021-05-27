@@ -51,7 +51,7 @@ void GmlDataBase::insertRencentFileList(QString filepath)
     //最多支持10条历史记录
     QString rowCntCmd = QString("select count(*) from RecentFilePath");
     query.exec(rowCntCmd);
-    int rowCnt;
+    int rowCnt = 10;
     while (query.next()) {
         rowCnt = query.value(0).toInt();
     }

@@ -29,7 +29,6 @@ SOURCES += \
     fullsub/createprojectdialog.cpp
 
 INCLUDEPATH += qscitinlla
-LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5d
 
 FORMS += \
     fullsub/searchdialog.ui \
@@ -39,4 +38,11 @@ FORMS += \
 RESOURCES += \
     gml_ide.qrc
 
-CONFIG += c++11
+CONFIG += c++11 debug_and_release
+
+CONFIG(debug,debug|release){
+LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5d
+}
+CONFIG(release,debug|release){
+LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5
+}
