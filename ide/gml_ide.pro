@@ -41,8 +41,16 @@ RESOURCES += \
 CONFIG += c++11 debug_and_release
 
 CONFIG(debug,debug|release){
-LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5d
+    win32: {
+        LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5d
+    } else {
+        LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5d.so.13.0.0
+    }
 }
 CONFIG(release,debug|release){
-LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5
+    win32: {
+        LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5
+    } else {
+        LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5.so.13.0.0
+    }
 }
