@@ -44,13 +44,13 @@ CONFIG(debug,debug|release){
     win32: {
         LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5d
     } else {
-        LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5d.so.13.0.0
+        LIBS += -L$$PWD/qscitinlla/linuxd -lqscintilla2_qt5
     }
 }
 CONFIG(release,debug|release){
     win32: {
         LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5
     } else {
-        LIBS += -L$$PWD/qscitinlla -lqscintilla2_qt5.so.13.0.0
+        LIBS += -L$$PWD/qscitinlla/linuxr -lqscintilla2_qt5
     }
 }
