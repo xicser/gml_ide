@@ -293,7 +293,7 @@ bool ProjView::refreshProjTreeView()
     QDomElement root = doc.documentElement();
 
     //添加工程根节点
-    QStandardItem *proTopNode = new QStandardItem(QIcon(":/resource/filenew.png"), root.attribute("name"));
+    QStandardItem *proTopNode = new QStandardItem(QIcon(":/resource/notepad.png"), root.attribute("name"));
     proTopNode->setEditable(false);
     modelTree->appendRow(proTopNode);
 
