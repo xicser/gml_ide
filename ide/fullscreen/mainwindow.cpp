@@ -577,6 +577,13 @@ void MainWindow::slotCreateProject()
 
     connect(createProjectDialog, &CreateProjectDialog::signalConfirmBtnClicked , [=]() {
 
+        if (createProjectDialog->getProjectFilePath().isEmpty() == true ||
+            createProjectDialog->getProjectFileName().isEmpty() == true) {
+
+            QMessageBox::warning(this, "Error", "Invalid path or name !");
+            return;
+        }
+
         //先关闭之前的工程
         if (this->hasOpenProj == true) {
             slotCloseProject();
