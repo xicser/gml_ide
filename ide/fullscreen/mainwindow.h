@@ -26,7 +26,7 @@ public:
     bool getHasOpenProj();                        //获取hasOpenProj
     void openFileWithFilePath(QString filepath);  //根据文件路径打开文件
     void jumpToTabAccordingFilePath(QString);     //根据文件路径, 跳转到其对应的tab
-
+    void setStatusBarContent(QString);            //设置状态栏显示内容
 
 protected:
     void closeEvent(QCloseEvent *);

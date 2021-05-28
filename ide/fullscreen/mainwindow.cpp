@@ -72,9 +72,21 @@ void MainWindow::jumpToTabAccordingFilePath(QString filepath)
         if (tabInfoList[i].filePath == filepath) {
             NotePadTab *notePadTab = tabInfoList[i].notePadTab;
             this->tabWidget->setCurrentWidget(notePadTab);
+            this->setStatusBarContent(notePadTab->getFilePath());
             break;
         }
     }
+}
+
+/* 设置状态栏显示内容 */
+void MainWindow::setStatusBarContent(QString filepath)
+{
+    QString displayContent = "file: ";
+    if (filepath.isEmpty() == false) {
+        displayContent += filepath;
+    }
+    this->statusBar->showMessage(displayContent);
+
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -562,6 +574,8 @@ void MainWindow::openFileWithFilePath(QString filepath)
     //聚焦到刚刚打开的文件tab上
     this->tabWidget->setCurrentWidget(tabInfo.notePadTab);
     tabInfo.notePadTab->setFocus();
+
+    this->setStatusBarContent(filepath);
 }
 
 /* 创建工程 */
@@ -717,6 +731,8 @@ void MainWindow::slotFileNew()
     this->tabWidget->setCurrentWidget(tabInfo.notePadTab);
     tabInfo.notePadTab->setFocus();
 
+    this->setStatusBarContent("new");
+
     //如果当前有打开的工程, 则提示是否添加到工程中
     if (hasOpenProj == true) {
 
@@ -729,6 +745,8 @@ void MainWindow::slotFileNew()
             if (filepath.isEmpty() == true) {
                 return;
             }
+
+            this->setStatusBarContent(filepath);
 
             disconnect(tabInfo.notePadTab, &QsciScintilla::textChanged, tabInfo.notePadTab, &NotePadTab::slotContentChanged);
             disconnect(tabInfo.notePadTab, &NotePadTab::signalContentHasChanged, this, &MainWindow::slotNotePadContentChanged);
@@ -791,6 +809,8 @@ void MainWindow::slotFileSave()
 
         QString filepath = QFileDialog::getSaveFileName(this, tmpStr, ".", "gml source(*.gml);;all(*.*)");
         if (filepath.isEmpty() == false) {
+
+            this->setStatusBarContent(filepath);
 
             //保存这个文件路径到最近打开文件列表
             gmlDataBase->insertRencentFileList(filepath);
@@ -999,6 +1019,16 @@ void MainWindow::slotFileClose()
         }
         delete notePadTabActive;
     }
+
+    //没有tab的时候, 状态栏清空显示
+    if (tabInfoList.size() == 0) {
+        this->setStatusBarContent("");
+    }
+    else {
+        //获取关闭后当前活动的tab
+        NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->currentWidget());
+        this->setStatusBarContent(notePadTabActive->getFilePath());
+    }
 }
 
 /* 关闭所有文件 */
@@ -1063,6 +1093,8 @@ bool MainWindow::slotFileCloseAll()
             delete notePadTabActive;
         }
     }
+
+    this->setStatusBarContent("");
 
     return false;
 }
@@ -1449,12 +1481,13 @@ void MainWindow::slotTabRequestClose(int index)
 /* tab被点击 */
 void MainWindow::slotTabBarClicked(int index)
 {
+    //先获取当前活动的子窗体
+    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->widget(index));
+    this->setStatusBarContent(notePadTabActive->getFilePath());
+
     if (this->hasOpenProj == false) {
         return;
     }
-
-    //先获取当前活动的子窗体
-    NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->widget(index));
 
     //选中左侧工程树中对应的文件
     projView->selectFileNodeAccordingFilePath(notePadTabActive->getFilePath());
