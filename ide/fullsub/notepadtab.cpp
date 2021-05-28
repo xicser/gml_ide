@@ -34,6 +34,7 @@ void NotePadTab::editorInit(void)
 
     //设置tab的宽度
     this->setTabWidth(4);
+    this->setIndentationsUseTabs(false);//用空格代替\t
 
     //设置括号等自动补全
     this->setAutoIndent(true);
@@ -55,6 +56,10 @@ void NotePadTab::editorInit(void)
     this->setAutoCompletionSource(QsciScintilla::AcsAll);   //设置源, 自动补全所有地方出现的
     this->setAutoCompletionCaseSensitivity(true);           //设置自动补全大小写敏感
     this->setAutoCompletionThreshold(1);                    //设置每输入1个字符就会出现自动补全的提示
+
+    //折叠
+    this->setFolding(QsciScintilla::BoxedTreeFoldStyle);    //折叠样式
+    this->setFoldMarginColors(Qt::gray, Qt::lightGray);     //折叠栏颜色
 }
 
 
