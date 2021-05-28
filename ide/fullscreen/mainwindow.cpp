@@ -314,27 +314,27 @@ void MainWindow::setupEditMenu()
 void MainWindow::setupFormatMenu()
 {
     formatMenu = new QMenu("&Format", menuBar);
-    enCodingMenu = new QMenu("Encoding", formatMenu);
+    //enCodingMenu = new QMenu("Encoding", formatMenu);
 
     //字体
     fontAct = new QAction(QIcon(":/resource/textfont.png"), "Font", formatMenu);
     topToolBar->addAction(fontAct);
     topToolBar->addSeparator();
 
-    //UTF-8
-    enCodingUTF8Act = new QAction("UTF-8", enCodingMenu);
-    enCodingUTF8Act->setCheckable(true);
-    enCodingUTF8Act->setChecked(true);
+//    //UTF-8
+//    enCodingUTF8Act = new QAction("UTF-8", enCodingMenu);
+//    enCodingUTF8Act->setCheckable(true);
+//    enCodingUTF8Act->setChecked(true);
 
-    //GB2312
-    enCodingGB2312Act = new QAction("GB2312", enCodingMenu);
-    enCodingGB2312Act->setCheckable(true);
-    enCodingGB2312Act->setChecked(false);
+//    //GB2312
+//    enCodingGB2312Act = new QAction("GB2312", enCodingMenu);
+//    enCodingGB2312Act->setCheckable(true);
+//    enCodingGB2312Act->setChecked(false);
 
-    formatMenu->addMenu(enCodingMenu);
-    enCodingMenu->addAction(enCodingUTF8Act);
-    enCodingMenu->addAction(enCodingGB2312Act);
-    formatMenu->addSeparator();
+    //formatMenu->addMenu(enCodingMenu);
+    //enCodingMenu->addAction(enCodingUTF8Act);
+    //enCodingMenu->addAction(enCodingGB2312Act);
+    //formatMenu->addSeparator();
     formatMenu->addAction(fontAct);
 
     menuBar->addMenu(formatMenu);
@@ -460,8 +460,8 @@ void MainWindow::setupEditActions()
 void MainWindow::setupFormatActions()
 {
     connect(fontAct, &QAction::triggered, this, &MainWindow::slotFontSelection);
-    connect(enCodingUTF8Act, &QAction::triggered, this, &MainWindow::slotEncodingUTF8);
-    connect(enCodingGB2312Act, &QAction::triggered, this, &MainWindow::slotEncodingGB2312);
+//    connect(enCodingUTF8Act, &QAction::triggered, this, &MainWindow::slotEncodingUTF8);
+//    connect(enCodingGB2312Act, &QAction::triggered, this, &MainWindow::slotEncodingGB2312);
 }
 
 /* 构建菜单Action设置 */

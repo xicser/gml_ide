@@ -43,7 +43,7 @@ void NotePadTab::editorInit(void)
     this->setCaretLineBackgroundColor(QColor(217, 235, 249));
 
     //设置默认换行符
-    //this->setEolMode(QsciScintilla::EolUnix);
+    this->setEolMode(QsciScintilla::EolUnix);
 
     //代码提示
     //设置C++解析器
@@ -55,7 +55,6 @@ void NotePadTab::editorInit(void)
     this->setAutoCompletionSource(QsciScintilla::AcsAll);   //设置源, 自动补全所有地方出现的
     this->setAutoCompletionCaseSensitivity(true);           //设置自动补全大小写敏感
     this->setAutoCompletionThreshold(1);                    //设置每输入1个字符就会出现自动补全的提示
-
 }
 
 
@@ -102,8 +101,8 @@ void NotePadTab::setEncoding(QString encoding)
         this->SendScintilla(QsciScintilla::SCI_SETCODEPAGE, QsciScintilla::SC_CP_UTF8);
     } else {
 
-        this->SendScintilla(QsciScintilla::SCI_SETCODEPAGE, 936);
-        this->SendScintilla(QsciScintilla::SCI_STYLESETCHARACTERSET,  QsciScintilla::SC_CHARSET_GB2312);
+//        this->SendScintilla(QsciScintilla::SCI_SETCODEPAGE, 936);
+//        this->SendScintilla(QsciScintilla::SCI_STYLESETCHARACTERSET,  QsciScintilla::SC_CHARSET_GB2312);
 
 //        qDebug() << this->SendScintilla(QsciScintilla::SCI_GETCODEPAGE);
 //        qDebug() << this->SendScintilla(QsciScintilla::SCI_STYLEGETCHARACTERSET);
