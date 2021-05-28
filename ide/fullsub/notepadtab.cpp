@@ -48,20 +48,33 @@ void NotePadTab::editorInit(void)
 
     //代码提示
     //设置C++解析器
-    textLexer = new QsciLexerCPP(this);
+    textLexer = new LexerGML(this);
     this->setLexer(textLexer);
     apis = new QsciAPIs(textLexer);
-    apis->add(QString("import")); //添加可提示的单词
+    this->addSelfDefineCueWord(apis);                       //添加自定义可提示的单词
     apis->prepare();
     this->setAutoCompletionSource(QsciScintilla::AcsAll);   //设置源, 自动补全所有地方出现的
     this->setAutoCompletionCaseSensitivity(true);           //设置自动补全大小写敏感
     this->setAutoCompletionThreshold(1);                    //设置每输入1个字符就会出现自动补全的提示
+
+    //自定义高亮关键字
+    textLexer->setColor(QColor(Qt::red), QsciLexerCPP::KeywordSet2);
 
     //折叠
     this->setFolding(QsciScintilla::BoxedTreeFoldStyle);    //折叠样式
     this->setFoldMarginColors(Qt::gray, Qt::lightGray);     //折叠栏颜色
 }
 
+/* 添加自定义提示词 */
+void NotePadTab::addSelfDefineCueWord(QsciAPIs *apis)
+{
+    QStringList cueWords;
+    cueWords << "self" << "str";
+
+    for (int i = 0; i < cueWords.size(); i++) {
+        apis->add(cueWords[i]);
+    }
+}
 
 /* 设置编辑状态 */
 void NotePadTab::setEditStatus(bool status)

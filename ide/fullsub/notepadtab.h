@@ -1,11 +1,10 @@
 #ifndef NOTEPADTAB_H
 #define NOTEPADTAB_H
 
-#include <QTextEdit>
+#include "qscitinlla/lexergml.h"
 #include <Qsci/qsciscintilla.h>
-#include <Qsci/qscilexerpython.h>
-#include <Qsci/qscilexercpp.h>
 #include <Qsci/qsciapis.h>
+
 
 class NotePadTab : public QsciScintilla
 {
@@ -33,10 +32,11 @@ private:
     QString enCoding;               //编码格式(目前支持uft-8和gb2312)
     QFont   font;                   //显示字体
 
-    QsciLexerCPP *textLexer;        //解析器
+    LexerGML *textLexer;            //解析器
     QsciAPIs *apis;                 //代码提示
 
     void editorInit(void);          //编辑器初始化
+    void addSelfDefineCueWord(QsciAPIs *apis);      //添加自定义提示词
 
 public slots:
     void slotContentChanged(void);                  //文本内容改变时, 调用该槽发送signalContentHasChanged信号

@@ -15,7 +15,8 @@ HEADERS += \
     fullsub/gotolinedialog.h \
     database/gmldatabase.h \
     fullsub/projview.h \
-    fullsub/createprojectdialog.h
+    fullsub/createprojectdialog.h \
+    qscitinlla/lexergml.h
 
 SOURCES += \
     fullscreen/mainwindow.cpp \
@@ -26,7 +27,8 @@ SOURCES += \
     fullsub/gotolinedialog.cpp \
     database/gmldatabase.cpp \
     fullsub/projview.cpp \
-    fullsub/createprojectdialog.cpp
+    fullsub/createprojectdialog.cpp \
+    qscitinlla/lexergml.cpp
 
 INCLUDEPATH += qscitinlla
 
