@@ -101,6 +101,7 @@ void MainWindow::init()
     this->font.setWeight(QFont::Normal);
 
     this->setAttribute(Qt::WA_DeleteOnClose);
+    this->setContextMenuPolicy(Qt::NoContextMenu);
     setWindowIcon(QIcon(":/resource/notepad.png"));
     setWindowTitle("GML Integrated Development Environment");
 
@@ -131,6 +132,7 @@ void MainWindow::init()
     logDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     logDock->setAllowedAreas(Qt::AllDockWidgetAreas);
     logTextEdit = new LogTextEdit(logDock);
+    logTextEdit->setText("Logging...");
     logDock->setWidget(logTextEdit);
     this->addDockWidget(Qt::BottomDockWidgetArea, logDock);
 
