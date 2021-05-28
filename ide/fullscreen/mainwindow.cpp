@@ -1449,6 +1449,10 @@ void MainWindow::slotTabRequestClose(int index)
 /* tab被点击 */
 void MainWindow::slotTabBarClicked(int index)
 {
+    if (this->hasOpenProj == false) {
+        return;
+    }
+
     //先获取当前活动的子窗体
     NotePadTab *notePadTabActive = static_cast<NotePadTab *>(this->tabWidget->widget(index));
 
