@@ -1,0 +1,8 @@
+prefix=/home/cps/catkin_ws_all_0405/devel
+
+Name: xml_interpreter
+Description: Description of xml_interpreter
+Version: 0.0.0
+Cflags: -I/home/cps/catkin_ws_all_0405/src/gml_verify/application/xml_interpreter/include
+Libs: -L${prefix}/lib 
+Requires: 

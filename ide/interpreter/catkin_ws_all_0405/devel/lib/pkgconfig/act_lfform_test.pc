@@ -1,0 +1,8 @@
+prefix=/home/cps/catkin_ws_all_0405/devel
+
+Name: act_lfform_test
+Description: Description of act_lfform_test
+Version: 0.0.0
+Cflags: -I/home/cps/catkin_ws_all_0405/devel/include
+Libs: -L${prefix}/lib -lact_lfform_test
+Requires: message_runtime pluginlib roscpp std_msgs

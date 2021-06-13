@@ -1,0 +1,8 @@
+prefix=/home/cps/catkin_ws_all_0405/devel
+
+Name: qrotor_control_interface
+Description: Description of qrotor_control_interface
+Version: 0.0.0
+Cflags: -I/home/cps/catkin_ws_all_0405/src/gml_verify/common/qrotor_control_interface/include
+Libs: -L${prefix}/lib 
+Requires: roscpp std_msgs mav_msgs

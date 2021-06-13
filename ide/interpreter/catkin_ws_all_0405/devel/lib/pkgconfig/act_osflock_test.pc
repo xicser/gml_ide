@@ -1,0 +1,8 @@
+prefix=/home/cps/catkin_ws_all_0405/devel
+
+Name: act_osflock_test
+Description: Description of act_osflock_test
+Version: 0.7.1
+Cflags: -I/home/cps/catkin_ws_all_0405/devel/include
+Libs: -L${prefix}/lib -lact_osflock_test
+Requires: pluginlib roscpp std_msgs geometry_msgs

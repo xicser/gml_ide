@@ -1,0 +1,8 @@
+prefix=/home/cps/catkin_ws_all_0405/devel
+
+Name: uav_base
+Description: Description of uav_base
+Version: 0.0.0
+Cflags: -I/home/cps/catkin_ws_all_0405/src/gml_verify/common/uav_base/include
+Libs: -L${prefix}/lib 
+Requires: mav_msgs roscpp std_msgs
