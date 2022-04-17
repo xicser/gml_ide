@@ -1,8 +1,0 @@
-prefix=/home/cps/catkin_ws_all_0405/devel
-
-Name: hector_quadrotor_gazebo
-Description: Description of hector_quadrotor_gazebo
-Version: 0.3.5
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

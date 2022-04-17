@@ -1,8 +1,0 @@
-prefix=/home/cps/catkin_ws_all_0405/devel
-
-Name: event_syn
-Description: Description of event_syn
-Version: 0.0.0
-Cflags: -I/home/cps/catkin_ws_all_0405/devel/include -I/home/cps/catkin_ws_all_0405/src/gml_verify/application/event_syn/include
-Libs: -L${prefix}/lib -levent_syn
-Requires: message_runtime

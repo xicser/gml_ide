@@ -1,8 +1,0 @@
-prefix=/home/cps/catkin_ws_all_0405/devel
-
-Name: osflock_test
-Description: Description of osflock_test
-Version: 0.0.0
-Cflags: -I/home/cps/catkin_ws_all_0405/devel/include
-Libs: -L${prefix}/lib 
-Requires: 

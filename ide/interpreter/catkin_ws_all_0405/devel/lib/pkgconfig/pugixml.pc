@@ -1,8 +1,0 @@
-prefix=/home/cps/catkin_ws_all_0405/devel
-
-Name: pugixml
-Description: Description of pugixml
-Version: 1.7.1
-Cflags: -I/home/cps/catkin_ws_all_0405/src/gml_verify/libraries/pugixml/src/include
-Libs: -L${prefix}/lib -lpugixml
-Requires: 

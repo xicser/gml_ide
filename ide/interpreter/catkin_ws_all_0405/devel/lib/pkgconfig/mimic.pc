@@ -1,8 +1,0 @@
-prefix=/home/cps/catkin_ws_all_0405/devel
-
-Name: mimic
-Description: Description of mimic
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

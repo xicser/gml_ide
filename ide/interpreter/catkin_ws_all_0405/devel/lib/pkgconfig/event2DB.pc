@@ -1,8 +1,0 @@
-prefix=/home/cps/catkin_ws_all_0405/devel
-
-Name: event2DB
-Description: Description of event2DB
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

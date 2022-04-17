@@ -1,0 +1,8 @@
+prefix=/home/cps/catkin_ws_all_0405/devel
+
+Name: origin_gps_service
+Description: Description of origin_gps_service
+Version: 0.0.0
+Cflags: -I/home/cps/catkin_ws_all_0405/devel/include
+Libs: -L${prefix}/lib 
+Requires: 

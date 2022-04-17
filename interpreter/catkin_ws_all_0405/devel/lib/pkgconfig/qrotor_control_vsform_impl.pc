@@ -1,0 +1,8 @@
+prefix=/home/cps/catkin_ws_all_0405/devel
+
+Name: qrotor_control_vsform_impl
+Description: Description of qrotor_control_vsform_impl
+Version: 0.0.0
+Cflags: -I/home/cps/catkin_ws_all_0405/src/gml_verify/rosplugins/formation/qrotor_control_vsform_impl/include
+Libs: -L${prefix}/lib -lqrotor_control_vsform_impl
+Requires: roscpp qrotor_control_interface

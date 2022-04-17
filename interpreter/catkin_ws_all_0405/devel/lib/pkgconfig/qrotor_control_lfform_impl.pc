@@ -1,0 +1,8 @@
+prefix=/home/cps/catkin_ws_all_0405/devel
+
+Name: qrotor_control_lfform_impl
+Description: Description of qrotor_control_lfform_impl
+Version: 0.6.27
+Cflags: -I/home/cps/catkin_ws_all_0405/src/gml_verify/rosplugins/formation/qrotor_control_lfform_impl/include
+Libs: -L${prefix}/lib -lqrotor_control_lfform_impl
+Requires: qrotor_control_interface

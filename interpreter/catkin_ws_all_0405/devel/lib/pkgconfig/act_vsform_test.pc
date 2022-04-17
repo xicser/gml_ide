@@ -1,0 +1,8 @@
+prefix=/home/cps/catkin_ws_all_0405/devel
+
+Name: act_vsform_test
+Description: Description of act_vsform_test
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib -lact_vsform_test
+Requires: roscpp

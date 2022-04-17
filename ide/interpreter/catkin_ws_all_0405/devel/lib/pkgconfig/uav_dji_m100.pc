@@ -1,8 +1,0 @@
-prefix=/home/cps/catkin_ws_all_0405/devel
-
-Name: uav_dji_m100
-Description: Description of uav_dji_m100
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

@@ -1,8 +1,0 @@
-prefix=/home/cps/catkin_ws_all_0405/devel
-
-Name: gml_interpreter
-Description: Description of gml_interpreter
-Version: 0.0.0
-Cflags: -I/home/cps/catkin_ws_all_0405/src/gml_verify/application/gml_interpreter/include
-Libs: -L${prefix}/lib 
-Requires: 

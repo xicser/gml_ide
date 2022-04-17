@@ -1,0 +1,8 @@
+prefix=/home/cps/catkin_ws_all_0405/devel
+
+Name: event_comm_ros
+Description: Description of event_comm_ros
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
